@@ -16,6 +16,9 @@ que rompió la fidelidad.
 
 Sin dependencias. Solo Python 3.11 o superior.
 
+**Para presentarlo:** [`DEMO.md`](DEMO.md) tiene el guion minuto a minuto, y
+`demo.ps1` lo ejecuta con pausas. Sin red, sin permisos, cinco minutos.
+
 ---
 
 ## Cómo funciona

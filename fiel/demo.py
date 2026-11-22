@@ -8,6 +8,7 @@ compilado, incluye el caso real; si no, sigue con el ejemplo en Python.
 from __future__ import annotations
 
 import shutil
+import sys
 import tempfile
 from pathlib import Path
 
@@ -28,6 +29,14 @@ def _header(text: str) -> None:
     print("=" * 64)
 
 
+def _tick(pause: bool) -> None:
+    if pause and sys.stdin.isatty():
+        try:
+            input("  [Enter para seguir] ")
+        except EOFError:
+            pass
+
+
 def _pairs(result: CheckResult) -> None:
     for pair in result.pairs:
         print(f"  {pair.pair_id}: {pair.passed}/{pair.total} fieles")
@@ -42,7 +51,7 @@ def _copy(source: Path, name: str) -> Path:
     return target
 
 
-def demo_python() -> None:
+def demo_python(pause: bool) -> None:
     work = _copy(EXAMPLE / "demo", "py")
     project = load(work)
     try:
@@ -52,6 +61,7 @@ def demo_python() -> None:
         result = check_mod.check(project)
         _pairs(result)
 
+        _tick(pause)
         _header("2. El baseline permite adoptar la herramienta en un proyecto roto")
         check_mod.write_baseline(
             project.baseline_path(),
@@ -62,6 +72,7 @@ def demo_python() -> None:
         print(f"  conocidas: {len(known)}   nuevas: {len(fresh)}")
         print("  la puerta se abre para lo ya aceptado")
 
+        _tick(pause)
         _header("3. Un cambio nuevo rompe la puerta")
         source = (work / "port_regresion.py").read_text(encoding="utf-8")
         (work / "port_regresion.py").write_text(
@@ -81,7 +92,7 @@ def demo_python() -> None:
         shutil.rmtree(work, ignore_errors=True)
 
 
-def demo_rust() -> bool:
+def demo_rust(pause: bool) -> bool:
     source = EXAMPLE / "rust-demo"
     binary = next(source.glob("rust-port/target/*/release/cron-rs*"), None)
     if binary is None:
@@ -90,12 +101,14 @@ def demo_rust() -> bool:
     work = _copy(source, "rs")
     project = load(work)
     try:
+        _tick(pause)
         _header("4. Un port de verdad, compilado en Rust")
         result = check_mod.check(project)
         _pairs(result)
         if result.failed:
             print("  el port real no coincide en todos los casos base")
 
+        _tick(pause)
         _header("5. Casos trampa: lo que Python acepta y Rust no")
         pair = project.pairs[0]
         mutate.add_inputs(work / pair.corpus, TRAPS)
@@ -112,12 +125,13 @@ def demo_rust() -> bool:
         shutil.rmtree(work, ignore_errors=True)
 
 
-def run_demo() -> int:
+def run_demo(pause: bool = False) -> int:
     if not (EXAMPLE / "demo").is_dir():
         print(f"no encuentro los ejemplos en {EXAMPLE}")
         return 2
-    demo_python()
-    rust_ok = demo_rust()
+    demo_python(pause)
+    rust_ok = demo_rust(pause)
+    _tick(pause)
     _header("resumen")
     if rust_ok:
         print("  corpus grabado, port en Rust comprobado, 3 divergencias reales encontradas")

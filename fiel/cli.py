@@ -257,8 +257,7 @@ def _build_markdown(args: argparse.Namespace) -> str:
 
 
 def cmd_demo(args: argparse.Namespace) -> int:
-    del args
-    return run_demo()
+    return run_demo(getattr(args, "pause", False))
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -325,6 +324,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_comment.set_defaults(func=cmd_comment)
 
     p_demo = sub.add_parser("demo", help="la historia completa, en un comando")
+    p_demo.add_argument("--pause", action="store_true", help="espera Enter entre actos (para presentar en directo)")
     p_demo.set_defaults(func=cmd_demo)
 
     return parser
