@@ -1,4 +1,4 @@
-# fiel
+﻿# fiel
 
 ![fiel](https://github.com/Barbarno/fiel/actions/workflows/fiel.yml/badge.svg)
 
@@ -170,9 +170,9 @@ La especificación `fiel.demo.toml` junta cuatro parejas —el port bueno, el ro
 el de Rust y los tres casos trampa— para que el informe enseñe el sistema
 completo: 33 casos, 28 fieles y 5 divergencias con su entrada exacta.
 
-Y `fiel.estudio.toml` junta los cinco targets: **167 casos, 20 divergencias**.
+Y `fiel.estudio.toml` junta los cuatro targets: **177 comprobaciones, 20 divergencias**.
 
-## Los cinco targets
+## Los cuatro targets
 
 Cada target es una función distinta, con su original en Python, su port en Rust
 y dos corpus: uno normal y uno de trampas.

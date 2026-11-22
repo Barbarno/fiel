@@ -1,4 +1,4 @@
-# fiel
+﻿# fiel
 
 **Memoria del proyecto intermodular**
 
@@ -25,10 +25,9 @@ y comprueba, en cada cambio, que la versión nueva hace exactamente lo mismo.
 No opina: ejecuta las mismas entradas contra los dos programas y compara las
 salidas.
 
-El proyecto incluye la herramienta, cinco casos de uso reales (cuatro
-funciones distintas, dos lenguajes), 167 casos grabados, un estudio con ports
-escritos por IA y un _check_ de GitHub que bloquea un pull request cuando la
-equivalencia se rompe.
+El proyecto incluye la herramienta, cuatro funciones convertidas en casos de
+uso reales, 167 casos grabados, un estudio con ports escritos por IA y un
+_check_ de GitHub que bloquea un pull request cuando la equivalencia se rompe.
 
 ---
 
@@ -99,7 +98,7 @@ compara y devuelve un código de salida.
 | No bloquear la adopción en proyectos que ya venían mal | el _baseline_ permite aceptar fallos existentes y fallar solo con los nuevos |
 | Encajar en el trabajo diario | un comando, código de salida 0/1, integración con GitHub Actions |
 | No depender de nada externo | solo Python 3.11 y biblioteca estándar |
-| Producir datos, no solo una herramienta | tabla de resultados con cinco targets y 167 casos |
+| Producir datos, no solo una herramienta | tabla de resultados con cuatro targets y 167 casos |
 
 ---
 
@@ -215,11 +214,11 @@ Eso no es una captura de pantalla: es el historial de un repositorio.
 
 ### 7.4 El estudio
 
-Se escribieron cinco funciones en Python (rango, URL, TOML, slug y el propio
-ejemplo del rango) y sus ports en Rust. Para cada una hay dos corpus:
+Se escribieron cuatro funciones en Python (rango, URL, TOML y slug) y sus
+ports en Rust. Para cada una hay dos corpus:
 
-- **normal**: 40 casos de uso corriente.
-- **trampas**: 7 a 9 casos límite (IPv6, enteros de 20 cifras, acentos, arrays
+- **normal**: 40 casos de uso corriente (10 en el ejemplo del rango).
+- **trampas**: 3 a 9 casos límite (IPv6, enteros de 20 cifras, acentos, arrays
   de cadenas).
 
 Resultado: los ports pasan el 100% de los casos normales y fallan 15 de las 24
@@ -234,15 +233,22 @@ del estudio, no una fila hecha a mano para que quedara bien.
 
 ## 8. Resultados
 
-| target | casos normales | fieles | trampas | divergencias |
-|---|---|---|---|---|
-| cron (Python) | 20 | 18 | 3 | 3 |
-| cron (Rust) | 10 | 10 | 3 | 3 |
-| url | 40 | 40 | 9 | 5 |
-| toml | 40 | 40 | 8 | 5 |
-| slug | 40 | 40 | 7 | 5 |
+| pareja | casos | fieles | divergencias |
+|---|---|---|---|
+| cron-fiel | 10 | 10 | 0 |
+| cron-roto | 10 | 8 | 2 |
+| cron-rust | 10 | 10 | 0 |
+| cron-rust-trampas | 3 | 0 | 3 |
+| url | 40 | 40 | 0 |
+| url-trampas | 9 | 4 | 5 |
+| toml | 40 | 40 | 0 |
+| toml-trampas | 8 | 3 | 5 |
+| slug | 40 | 40 | 0 |
+| slug-trampas | 7 | 2 | 5 |
+| **total** | **177** | **157** | **20** |
 
-Casos totales: **167**. Divergencias encontradas: **20**.
+Casos únicos grabados: **167**. Comprobaciones por vuelta: **177** (el corpus
+del ejemplo del rango lo usan dos parejas). Divergencias encontradas: **20**.
 
 Las divergencias no son de sintaxis. Son de comportamiento:
 
@@ -280,7 +286,7 @@ es más creíble que uno que los esconde.
 ## 10. Conclusiones
 
 1. La equivalencia no se demuestra una vez. Se mantiene.
-2. Un port que pasa los tests puede no ser equivalente: los cinco targets lo
+2. Un port que pasa los tests puede no ser equivalente: los cuatro targets lo
    demuestran con 20 divergencias reales.
 3. La herramienta es pequeña a propósito. Su valor no está en las líneas, sino
    en que produce una respuesta binaria y verificable en cada cambio.
