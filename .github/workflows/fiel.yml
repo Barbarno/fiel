@@ -1,0 +1,25 @@
+name: fiel
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  fidelidad:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar
+        run: pip install .
+
+      - name: Pruebas
+        run: python -m unittest discover -s tests -v
+
+      - name: Comprobar fidelidad del ejemplo
+        run: fiel --root examples/demo check --format github --no-baseline --pair cron-fiel

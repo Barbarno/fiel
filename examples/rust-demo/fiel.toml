@@ -1,0 +1,23 @@
+# Demo con un port de verdad, en Rust.
+#
+# original.py es el original. rust-port/ es la reescritura.
+# Los casos base pasan. Los casos trampa no, y ese es el hallazgo.
+#
+# Antes de la primera comprobacion, compila el port:
+#   cd rust-port && cargo build --release --target x86_64-pc-windows-gnu
+# En Linux o macOS:  cargo build --release
+# y cambia 'port' por la ruta del binario que genere tu sistema.
+
+[project]
+baseline = "fiel.baseline.json"
+
+[[pair]]
+id = "cron-rust"
+original = { command = ["python", "original.py"] }
+port = { command = ["rust-port/target/x86_64-pc-windows-gnu/release/cron-rs.exe"] }
+corpus = "corpus/cron.jsonl"
+timeout_ms = 10000
+normalize = "text"
+# El mensaje de error de Rust no tiene por que coincidir con el de Python.
+# Lo que importa es si falla o no falla.
+errors = "ignore"

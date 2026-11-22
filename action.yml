@@ -1,0 +1,33 @@
+name: fiel
+description: Mantiene un port fiel a su original. Falla el build cuando la equivalencia se rompe.
+author: fiel
+
+inputs:
+  root:
+    description: Directorio donde esta fiel.toml
+    required: false
+    default: "."
+  args:
+    description: Argumentos extra para `fiel check`
+    required: false
+    default: ""
+  python-version:
+    description: Version de Python para el runner
+    required: false
+    default: "3.12"
+
+runs:
+  using: composite
+  steps:
+    - name: Preparar Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Instalar fiel
+      shell: bash
+      run: pip install --quiet "${{ github.action_path }}"
+
+    - name: Comprobar equivalencia
+      shell: bash
+      run: fiel --root "${{ inputs.root }}" check --format github ${{ inputs.args }}

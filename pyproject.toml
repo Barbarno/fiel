@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fiel"
+version = "0.1.0"
+description = "Mantiene un port fiel a su original, para siempre."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "fiel" }]
+dependencies = []
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.scripts]
+fiel = "fiel.cli:main"
+
+[tool.setuptools]
+packages = ["fiel"]

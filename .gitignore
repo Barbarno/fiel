@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Rust
+target/
+
+# fiel
+fiel.baseline.json.bak
+
+# editores
+.vscode/
+.idea/
+*.swp
+.DS_Store

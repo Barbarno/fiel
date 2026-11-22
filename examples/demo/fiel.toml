@@ -1,0 +1,21 @@
+# Demo de fiel: dos ports del mismo original.
+# Uno fiel, otro con una regresion de una linea (rango exclusivo).
+
+[project]
+baseline = "fiel.baseline.json"
+
+[[pair]]
+id = "cron-fiel"
+original = { command = ["python", "original.py"] }
+port = { command = ["python", "port.py"] }
+corpus = "corpus/cron.jsonl"
+timeout_ms = 5000
+normalize = "text"
+
+[[pair]]
+id = "cron-roto"
+original = { command = ["python", "original.py"] }
+port = { command = ["python", "port_regresion.py"] }
+corpus = "corpus/cron.jsonl"
+timeout_ms = 5000
+normalize = "text"
