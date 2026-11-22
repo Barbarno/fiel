@@ -144,10 +144,25 @@ idempotente listo para publicar.
 | `fiel baseline` | acepta las divergencias actuales (`--prune` limpia las resueltas) |
 | `fiel bisect --since <ref>` | encuentra el commit que rompió la fidelidad |
 | `fiel comment` | publica o actualiza el informe en un pull request |
+| `fiel report` | escribe un informe HTML en un solo fichero (`--out`, `--open`) |
 | `fiel demo` | la historia completa, sin preparar nada |
 
 Opciones útiles de `check`: `--pair`, `--case`, `--jobs`, `--strict` (ignora el
 baseline), `--no-baseline`, `--format console|markdown|github|json`.
+
+## El informe
+
+`fiel report` escribe un HTML en un solo fichero: sin javascript, sin
+dependencias externas, se abre con el wifi apagado y se adjunta a la memoria
+tal cual.
+
+```bash
+fiel --spec fiel.demo.toml report --out informe.html --open
+```
+
+La especificación `fiel.demo.toml` junta cuatro parejas —el port bueno, el roto,
+el de Rust y los tres casos trampa— para que el informe enseñe el sistema
+completo: 33 casos, 28 fieles y 5 divergencias con su entrada exacta.
 
 ## Casos que aparecen solos
 

@@ -16,6 +16,7 @@ from .bisect import BisectError, run_bisect
 from .bot import BotError, resolve_token, upsert_comment
 from .demo import run_demo
 from .report import console, github_annotations, markdown
+from .report_html import write as write_html
 from .spec import SpecError, TEMPLATE, load
 
 EXIT_OK = 0
@@ -260,6 +261,37 @@ def cmd_demo(args: argparse.Namespace) -> int:
     return run_demo(getattr(args, "pause", False))
 
 
+def cmd_report(args: argparse.Namespace) -> int:
+    project = load(_root(args), args.spec)
+    try:
+        result = check_mod.check(project, pairs=args.pair, jobs=args.jobs)
+    except (ValueError, corpus_mod.CorpusError) as exc:
+        print(f"fiel: {exc}", file=sys.stderr)
+        return EXIT_ERROR
+
+    if result.errors:
+        for error in result.errors:
+            print(f"fiel: {error}", file=sys.stderr)
+        return EXIT_ERROR
+
+    baseline = {} if args.no_baseline else check_mod.load_baseline(project.baseline_path())
+    known, fresh = check_mod.split_by_baseline(result, baseline)
+
+    target = Path(args.out)
+    if not target.is_absolute():
+        target = _root(args) / target
+    write_html(project, result, known, fresh, target, title=args.title)
+
+    print(f"informe escrito en {target}")
+    print(f"{result.total} casos, {result.failed} divergencias ({len(fresh)} nuevas)")
+
+    if args.open:
+        import webbrowser
+
+        webbrowser.open(target.resolve().as_uri())
+    return EXIT_DIVERGENCE if fresh else EXIT_OK
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="fiel", description="mantiene un port fiel a su original")
     parser.add_argument("--version", action="version", version=f"fiel {__version__}")
@@ -326,6 +358,14 @@ def build_parser() -> argparse.ArgumentParser:
     p_demo = sub.add_parser("demo", help="la historia completa, en un comando")
     p_demo.add_argument("--pause", action="store_true", help="espera Enter entre actos (para presentar en directo)")
     p_demo.set_defaults(func=cmd_demo)
+
+    p_report = sub.add_parser("report", help="escribe un informe HTML con los resultados")
+    p_report.add_argument("--out", default="informe.html", help="fichero de salida (por defecto: informe.html)")
+    p_report.add_argument("--title", default="fiel", help="titulo del informe")
+    p_report.add_argument("--open", action="store_true", help="abrir el informe al terminar")
+    p_report.add_argument("--no-baseline", action="store_true")
+    add_common(p_report)
+    p_report.set_defaults(func=cmd_report)
 
     return parser
 

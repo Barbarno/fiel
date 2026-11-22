@@ -12,6 +12,7 @@ target/
 
 # fiel
 fiel.baseline.json.bak
+informe.html
 
 # editores
 .vscode/

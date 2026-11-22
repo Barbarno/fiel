@@ -1,0 +1,42 @@
+# Especificacion para el informe y la presentacion.
+#
+# Cuatro parejas, dos verdes y dos rojas, todas reales y ejecutables.
+#   fiel --spec fiel.demo.toml report --out informe.html
+#
+# No lo usa el CI: el CI comprueba los ejemplos por separado para que un rojo
+# intencionado no tape una regresion de verdad.
+
+[project]
+baseline = "fiel.baseline.json"
+
+[[pair]]
+id = "cron-fiel"
+original = { command = ["python", "examples/demo/original.py"] }
+port = { command = ["python", "examples/demo/port.py"] }
+corpus = "examples/demo/corpus/cron.jsonl"
+normalize = "text"
+
+[[pair]]
+id = "cron-roto"
+original = { command = ["python", "examples/demo/original.py"] }
+port = { command = ["python", "examples/demo/port_regresion.py"] }
+corpus = "examples/demo/corpus/cron.jsonl"
+normalize = "text"
+
+[[pair]]
+id = "cron-rust"
+original = { command = ["python", "examples/rust-demo/original.py"] }
+port = { command = ["examples/rust-demo/rust-port/target/x86_64-pc-windows-gnu/release/cron-rs.exe"] }
+corpus = "examples/rust-demo/corpus/cron.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "cron-rust-trampas"
+original = { command = ["python", "examples/rust-demo/original.py"] }
+port = { command = ["examples/rust-demo/rust-port/target/x86_64-pc-windows-gnu/release/cron-rs.exe"] }
+corpus = "examples/rust-demo/corpus/traps.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"

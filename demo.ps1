@@ -94,7 +94,15 @@ try {
     Pausa
 
     # ---------------------------------------------------------------
-    Paso "7. El registro: un pull request real con el check en rojo"
+    Paso "7. El informe: los mismos números, en una pantalla"
+    Comando "python -m fiel --spec fiel.demo.toml report --out informe.html --open"
+    Fiel --spec fiel.demo.toml report --out informe.html --open
+    Write-Host ""
+    Write-Host "  33 casos, 5 divergencias, cada una con su entrada exacta." -ForegroundColor Green
+    Pausa
+
+    # ---------------------------------------------------------------
+    Paso "8. El registro: un pull request real con el check en rojo"
     $url = "https://github.com/Barbarno/fiel/pull/1"
     Write-Host ""
     Write-Host "  $url" -ForegroundColor Blue
