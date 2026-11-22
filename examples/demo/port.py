@@ -21,7 +21,7 @@ def parse(expr: str) -> list[int]:
         start, end = int(left), int(right)
         if start > end:
             raise ValueError("rango invertido")
-        return list(range(start, end + 1))
+        return list(range(start, end))
     return [int(expr)]
 
 
