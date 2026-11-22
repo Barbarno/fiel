@@ -1,0 +1,28 @@
+# Target 'url': un original en Python y su port en Rust.
+#
+# Compila antes de comprobar:
+#   cd rust-port && cargo build --release --target x86_64-pc-windows-gnu
+#
+# 'url' son los 40 casos normales. 'url-trampas' son los que separan un port
+# que funciona de un port fiel.
+
+[project]
+baseline = "fiel.baseline.json"
+
+[[pair]]
+id = "url"
+original = { command = ["python", "original.py"] }
+port = { command = ["rust-port/target/x86_64-pc-windows-gnu/release/url-rs.exe"] }
+corpus = "corpus/url.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "url-trampas"
+original = { command = ["python", "original.py"] }
+port = { command = ["rust-port/target/x86_64-pc-windows-gnu/release/url-rs.exe"] }
+corpus = "corpus/traps.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"

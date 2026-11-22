@@ -1,0 +1,40 @@
+Hola Mundo
+Rust: rapido y seguro!
+   espacios   alrededor   
+a
+A
+hola-mundo
+hola_mundo
+hola.mundo
+Hola, mundo... otra vez
+123 456
+version 2.0
+C++ y Rust
+50% mas
+a/b/c
+--hola--
+hola!!!mundo
+uno    dos     tres
+uno-dos-tres
+a  b
+ejemplo de titulo para blog
+como hacer una web en 2026
+guia de rust para principiantes
+100 trucos de python
+hola mundo 2
+test
+mi primer proyecto
+proyecto intermodular daw
+fiel mantiene la equivalencia
+los 3 cerditos
+a1b2c3
+x
+abc123
+con guiones - y espacios
+muchos    espacios
+fin.
+.inicio
+medio
+a-b-c
+2026
+zapato azul

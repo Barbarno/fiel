@@ -1,0 +1,112 @@
+# Los cinco targets del estudio, en una sola comprobacion.
+#
+#   fiel --spec fiel.estudio.toml check
+#   fiel --spec fiel.estudio.toml report --out informe.html --open
+#
+# Cada target tiene dos parejas: el corpus normal y el corpus trampa. El normal
+# demuestra que el port funciona. El de trampas demuestra que "funciona" y
+# "es equivalente" no son lo mismo.
+#
+# Los binarios de Rust se compilan una vez:
+#   examples/rust-demo/rust-port                            -> cron-rs
+#   examples/targets/url/rust-port                          -> url-rs
+#   examples/targets/toml/rust-port                         -> toml-rs
+#   examples/targets/slug/rust-port                         -> slug-rs
+# con: cargo build --release --target x86_64-pc-windows-gnu
+
+[project]
+baseline = "fiel.baseline.json"
+
+# --- cron: el ejemplo pequeno, dos ports en Python y uno en Rust ------------
+
+[[pair]]
+id = "cron-fiel"
+original = { command = ["python", "examples/demo/original.py"] }
+port = { command = ["python", "examples/demo/port.py"] }
+corpus = "examples/demo/corpus/cron.jsonl"
+normalize = "text"
+
+[[pair]]
+id = "cron-roto"
+original = { command = ["python", "examples/demo/original.py"] }
+port = { command = ["python", "examples/demo/port_regresion.py"] }
+corpus = "examples/demo/corpus/cron.jsonl"
+normalize = "text"
+
+[[pair]]
+id = "cron-rust"
+original = { command = ["python", "examples/rust-demo/original.py"] }
+port = { command = ["examples/rust-demo/rust-port/target/x86_64-pc-windows-gnu/release/cron-rs.exe"] }
+corpus = "examples/rust-demo/corpus/cron.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "cron-rust-trampas"
+original = { command = ["python", "examples/rust-demo/original.py"] }
+port = { command = ["examples/rust-demo/rust-port/target/x86_64-pc-windows-gnu/release/cron-rs.exe"] }
+corpus = "examples/rust-demo/corpus/traps.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+# --- url -------------------------------------------------------------------
+
+[[pair]]
+id = "url"
+original = { command = ["python", "examples/targets/url/original.py"] }
+port = { command = ["examples/targets/url/rust-port/target/x86_64-pc-windows-gnu/release/url-rs.exe"] }
+corpus = "examples/targets/url/corpus/url.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "url-trampas"
+original = { command = ["python", "examples/targets/url/original.py"] }
+port = { command = ["examples/targets/url/rust-port/target/x86_64-pc-windows-gnu/release/url-rs.exe"] }
+corpus = "examples/targets/url/corpus/traps.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+# --- toml ------------------------------------------------------------------
+
+[[pair]]
+id = "toml"
+original = { command = ["python", "examples/targets/toml/original.py"] }
+port = { command = ["examples/targets/toml/rust-port/target/x86_64-pc-windows-gnu/release/toml-rs.exe"] }
+corpus = "examples/targets/toml/corpus/toml.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "toml-trampas"
+original = { command = ["python", "examples/targets/toml/original.py"] }
+port = { command = ["examples/targets/toml/rust-port/target/x86_64-pc-windows-gnu/release/toml-rs.exe"] }
+corpus = "examples/targets/toml/corpus/traps.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+# --- slug ------------------------------------------------------------------
+
+[[pair]]
+id = "slug"
+original = { command = ["python", "examples/targets/slug/original.py"] }
+port = { command = ["examples/targets/slug/rust-port/target/x86_64-pc-windows-gnu/release/slug-rs.exe"] }
+corpus = "examples/targets/slug/corpus/slug.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "slug-trampas"
+original = { command = ["python", "examples/targets/slug/original.py"] }
+port = { command = ["examples/targets/slug/rust-port/target/x86_64-pc-windows-gnu/release/slug-rs.exe"] }
+corpus = "examples/targets/slug/corpus/traps.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"

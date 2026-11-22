@@ -1,0 +1,38 @@
+# Los tres targets nuevos, compilados en Linux, solo con el corpus normal.
+#
+# Los corpus de trampas no entran aqui: estan para fallar y ensenar el hallazgo.
+# Lo que el CI comprueba es que los ports compilan y que pasan lo que tienen que
+# pasar.
+#
+#   cargo build --release   (en cada rust-port)
+#   fiel --spec fiel.linux.toml check
+
+[project]
+baseline = "fiel.baseline.json"
+
+[[pair]]
+id = "url"
+original = { command = ["python", "examples/targets/url/original.py"] }
+port = { command = ["examples/targets/url/rust-port/target/release/url-rs"] }
+corpus = "examples/targets/url/corpus/url.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "toml"
+original = { command = ["python", "examples/targets/toml/original.py"] }
+port = { command = ["examples/targets/toml/rust-port/target/release/toml-rs"] }
+corpus = "examples/targets/toml/corpus/toml.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "slug"
+original = { command = ["python", "examples/targets/slug/original.py"] }
+port = { command = ["examples/targets/slug/rust-port/target/release/slug-rs"] }
+corpus = "examples/targets/slug/corpus/slug.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"

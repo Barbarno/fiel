@@ -1,0 +1,35 @@
+# Modelos gratuitos, API compatible con OpenAI.
+#
+# No hay ninguna clave aqui: se leen de variables de entorno y no se escriben
+# en disco. Cualquiera de los tres sirve para llenar una fila de la tabla.
+#
+#   1. Crea una cuenta gratuita y saca una clave.
+#   2. Exportala en la misma terminal:
+#        $env:GROQ_API_KEY = "gsk_..."
+#   3. Genera los tres ports y mide:
+#        python estudio/estudio.py generar --modelo groq
+#        python estudio/estudio.py medir
+#
+# Si un modelo cambia de nombre, se edita la linea `nombre` y ya esta: el resto
+# del estudio no depende de cual sea.
+
+[[modelo]]
+id = "groq"
+nombre = "llama-3.3-70b-versatile"
+base_url = "https://api.groq.com/openai/v1"
+api_key_env = "GROQ_API_KEY"
+temperatura = 0.2
+
+[[modelo]]
+id = "gemini"
+nombre = "gemini-2.0-flash"
+base_url = "https://generativelanguage.googleapis.com/v1beta/openai"
+api_key_env = "GEMINI_API_KEY"
+temperatura = 0.2
+
+[[modelo]]
+id = "openrouter"
+nombre = "meta-llama/llama-3.3-70b-instruct:free"
+base_url = "https://openrouter.ai/api/v1"
+api_key_env = "OPENROUTER_API_KEY"
+temperatura = 0.2

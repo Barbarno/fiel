@@ -1,0 +1,25 @@
+# Target 'toml': un original en Python y su port en Rust.
+#
+# Compila antes de comprobar:
+#   cd rust-port && cargo build --release --target x86_64-pc-windows-gnu
+
+[project]
+baseline = "fiel.baseline.json"
+
+[[pair]]
+id = "toml"
+original = { command = ["python", "original.py"] }
+port = { command = ["rust-port/target/x86_64-pc-windows-gnu/release/toml-rs.exe"] }
+corpus = "corpus/toml.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "toml-trampas"
+original = { command = ["python", "original.py"] }
+port = { command = ["rust-port/target/x86_64-pc-windows-gnu/release/toml-rs.exe"] }
+corpus = "corpus/traps.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"

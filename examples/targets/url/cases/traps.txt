@@ -1,0 +1,8 @@
+http://example.com:80/a
+HTTP://example.com/x
+http://example.com
+http://[::1]:8080/x
+http://example.com:/x
+https://example.com:443/x
+http://example.com:65536/x
+http://example.com/ok

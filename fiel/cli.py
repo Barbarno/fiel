@@ -334,7 +334,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_bisect.set_defaults(func=cmd_bisect)
 
     p_add = sub.add_parser("add", help="anade casos nuevos al corpus")
-    p_add.add_argument("--pair", required=True)
+    p_add.add_argument("--pair", action="append", required=True)
     p_add.add_argument("--input", action="append", help="una entrada nueva (repetible)")
     p_add.add_argument("--file", help="fichero con una entrada por linea")
     p_add.add_argument("--jobs", type=int, default=4)
@@ -371,6 +371,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     parser = build_parser()
     args = parser.parse_args(argv)
     try:

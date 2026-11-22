@@ -19,6 +19,12 @@ Sin dependencias. Solo Python 3.11 o superior.
 **Para presentarlo:** [`DEMO.md`](DEMO.md) tiene el guion minuto a minuto, y
 `demo.ps1` lo ejecuta con pausas. Sin red, sin permisos, cinco minutos.
 
+**La memoria:** [`MEMORIA.md`](MEMORIA.md), con el problema, el diseño, las
+pruebas, los resultados y las limitaciones.
+
+**El estudio:** [`estudio/resultados.md`](estudio/resultados.md) mide ports
+generados por IA contra el corpus y publica la tabla.
+
 ---
 
 ## Cómo funciona
@@ -163,6 +169,35 @@ fiel --spec fiel.demo.toml report --out informe.html --open
 La especificación `fiel.demo.toml` junta cuatro parejas —el port bueno, el roto,
 el de Rust y los tres casos trampa— para que el informe enseñe el sistema
 completo: 33 casos, 28 fieles y 5 divergencias con su entrada exacta.
+
+Y `fiel.estudio.toml` junta los cinco targets: **167 casos, 20 divergencias**.
+
+## Los cinco targets
+
+Cada target es una función distinta, con su original en Python, su port en Rust
+y dos corpus: uno normal y uno de trampas.
+
+| target | qué hace | dónde se rompe |
+|---|---|---|
+| `cron` | rangos y pasos (`5-9`, `*/15`) | enteros sin límite, `1_0`, espacios |
+| `url` | separa las partes de una URL | IPv6, puerto por defecto, esquema en mayúsculas |
+| `toml` | una línea `clave = valor` | enteros de 20 cifras, `\u`, arrays de cadenas |
+| `slug` | título a URL (`Café` → `cafe`) | acentos, que Rust no pliega solo |
+
+Los ports pasan el 100% del corpus normal y fallan 15 de las 24 trampas. Eso es
+el proyecto entero en una frase: **funcionar no es ser equivalente**.
+
+## El estudio
+
+`estudio/` mide ports generados por modelos contra los mismos corpus:
+
+```bash
+python estudio/estudio.py generar --modelo groq   # necesita GROQ_API_KEY
+python estudio/estudio.py medir
+```
+
+Escribe `estudio/resultados.md` y `estudio/resultados.csv`. Las claves se leen
+del entorno; no hay ninguna en el repositorio.
 
 ## Casos que aparecen solos
 

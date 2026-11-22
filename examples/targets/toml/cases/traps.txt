@@ -1,0 +1,8 @@
+big = 99999999999999999999
+roto = 1__0
+unicode = "\u00e9"
+lista = ["a", "b"]
+siete = 007
+normal = 5
+final = 1_
+minus = -0

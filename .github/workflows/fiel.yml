@@ -48,3 +48,25 @@ jobs:
 
       - name: Comprobar equivalencia con el original
         run: fiel --root examples/rust-demo --spec fiel.linux.toml check --format github --no-baseline
+
+  targets:
+    name: tres targets nuevos en rust
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Instalar fiel
+        run: pip install .
+
+      - name: Compilar los tres ports
+        run: |
+          cargo build --release --manifest-path examples/targets/url/rust-port/Cargo.toml
+          cargo build --release --manifest-path examples/targets/toml/rust-port/Cargo.toml
+          cargo build --release --manifest-path examples/targets/slug/rust-port/Cargo.toml
+
+      - name: Comprobar equivalencia
+        run: fiel --spec fiel.linux.toml check --format github --no-baseline
