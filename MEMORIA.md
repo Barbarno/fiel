@@ -4,12 +4,12 @@
 
 | | |
 |---|---|
-| Autor | FILL: nombre y apellidos |
-| Ciclo | FILL: Desarrollo de Aplicaciones Web / Multiplataforma / Sistemas |
+| Autor | Dano |
+| Ciclo | Desarrollo de Aplicaciones Web (DAW) |
 | Centro | FILL: nombre del centro |
-| Curso | FILL: 2025/2026 |
-| Tutor | FILL: nombre |
-| Fecha de entrega | FILL: fecha |
+| Curso | 2025/2026 |
+| Tutor | FILL: nombre del tutor |
+| Fecha de entrega | 22 de noviembre de 2026 |
 
 ---
 
@@ -336,15 +336,18 @@ fiel --spec fiel.estudio.toml report --out informe.html --open
 
 ## 13. Planificación, horas y riesgos
 
-| fase | horas previstas | horas reales |
+| fase | horas previstas | horas reales* |
 |---|---|---|
-| Análisis y diseño | 10 | FILL |
-| Motor (corpus, comparación, CLI) | 25 | FILL |
-| Ejemplos y ports en Rust | 12 | FILL |
-| Pruebas y CI | 8 | FILL |
-| Estudio y resultados | 8 | FILL |
-| Memoria y presentación | 18 | FILL |
-| **Total** | **81** | **FILL** |
+| Análisis y diseño | 10 | 9 |
+| Motor (corpus, comparación, CLI) | 25 | 28 |
+| Ejemplos y ports en Rust | 12 | 16 |
+| Pruebas y CI | 8 | 7 |
+| Estudio y resultados | 8 | 6 |
+| Memoria y presentación | 18 | 14 |
+| **Total** | **81** | **80** |
+
+\* Estimación sobre el registro de trabajo del repositorio (commits y sesiones).
+Ajusta la columna a tus horas reales si llevas otro registro.
 
 Riesgos y cómo se resolvieron:
 

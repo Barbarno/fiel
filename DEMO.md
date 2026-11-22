@@ -155,7 +155,27 @@ cron-rust: 10/13 fieles
 
 ---
 
-## Acto 7 — El registro (30 segundos)
+## Acto 7 — El informe, en una pantalla (40 segundos)
+
+```powershell
+fiel --spec fiel.estudio.toml report --out informe.html --open
+```
+
+Se abre el navegador con el informe. Señala las cuatro tarjetas de arriba y una
+divergencia cualquiera.
+
+> "Todo lo que han visto en la consola, aquí. Cuatro funciones, diez parejas,
+> 177 comprobaciones y 20 divergencias, cada una con la entrada exacta que la
+> provocó: `5-9`, `1_0`, `Café`, un número de veinte cifras.
+> Sin javascript y sin conexión: el fichero se adjunta a la memoria y se abre
+> en cualquier ordenador."
+
+Si no quieres abrir el navegador en medio: ejecuta sin `--open` y enseña el
+fichero desde la carpeta.
+
+---
+
+## Acto 8 — El registro (30 segundos)
 
 Cambia a la pestaña del navegador con el pull request.
 

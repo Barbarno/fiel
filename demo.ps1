@@ -1,4 +1,4 @@
-# demo.ps1 - guion de la presentacion, paso a paso.
+﻿# demo.ps1 - guion de la presentacion, paso a paso.
 #
 # Uso normal (presentando):   .\demo.ps1
 # Uso sin pausas (ensayo):    .\demo.ps1 -NoPause
@@ -94,7 +94,7 @@ try {
     Pausa
 
     # ---------------------------------------------------------------
-    Paso "7. El informe: los mismos números, en una pantalla"
+    Paso "7. El informe: los mismos numeros, en una pantalla"
     Comando "python -m fiel --spec fiel.estudio.toml report --out informe.html --open"
     Fiel --spec fiel.estudio.toml report --out informe.html --open
     Write-Host ""

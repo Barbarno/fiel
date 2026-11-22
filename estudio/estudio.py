@@ -286,9 +286,30 @@ def _call(model: dict, key: str, prompt: str) -> str | None:
     return _extract_code(content)
 
 
+def cmd_estado(args: argparse.Namespace) -> int:
+    del args
+    config = tomllib.loads((ESTUDIO / "modelos.toml").read_text(encoding="utf-8"))
+    print("Modelos configurados:")
+    for model in config.get("modelo", []):
+        key = os.environ.get(model["api_key_env"], "")
+        mark = "clave lista" if key else f"falta {model['api_key_env']}"
+        ports = ESTUDIO / "salidas" / model["id"]
+        hecho = ports.is_dir() and all((ports / f"{t}.py").is_file() for t in TARGETS)
+        print(f"  {model['id']:<12} {model['nombre']:<40} {mark:<28} ports: {'si' if hecho else 'no'}")
+    print("")
+    if (ESTUDIO / "resultados.md").is_file():
+        print("Tabla actual: estudio/resultados.md")
+    else:
+        print("Tabla: todavia no hay. Ejecuta 'medir'.")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="estudio")
     sub = parser.add_subparsers(dest="command", required=True)
+
+    p_estado = sub.add_parser("estado", help="que modelos hay listos y que falta")
+    p_estado.set_defaults(func=cmd_estado)
 
     p_medir = sub.add_parser("medir", help="mide los ports y escribe la tabla")
     p_medir.add_argument("--quiet", action="store_true")
