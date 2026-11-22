@@ -124,7 +124,7 @@ def cmd_medir(args: argparse.Namespace) -> int:
         normal = check_mod.check(Project(root=ROOT, pairs=(_pair(target, "", port),)), jobs=4)
         traps = check_mod.check(Project(root=ROOT, pairs=(_pair(target, "-trampas", port),)), jobs=4)
         detalle[target] = (normal.total, normal.total - normal.failed, traps.total, traps.failed)
-    filas.append(_resumen("escrito a mano (Rust)", detalle))
+    filas.append(_resumen("port de IA (Rust, una pasada)", detalle))
 
     base = ESTUDIO / "salidas"
     if base.is_dir():
@@ -185,6 +185,9 @@ def _write(filas: list[dict[str, object]], args: argparse.Namespace) -> None:
     header = (
         "# Resultados\n\n"
         "Generado por `python estudio/estudio.py medir`. No se edita a mano.\n\n"
+        "La primera fila son los ports de Rust del repositorio: los escribió un\n"
+        "asistente de IA en una pasada, a partir de la especificación de cada\n"
+        "función. Las demás filas aparecen al ejecutar `generar` con un modelo.\n\n"
     )
     md.write_text(header + _markdown(filas) + "\n", encoding="utf-8")
 

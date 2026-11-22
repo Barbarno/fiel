@@ -226,6 +226,10 @@ Resultado: los ports pasan el 100% de los casos normales y fallan 15 de las 24
 trampas. Es decir, **un port que "funciona" no es un port equivalente**, y la
 diferencia solo aparece cuando se prueba a propósito.
 
+Los tres ports de Rust los escribió un asistente de IA a partir de la
+especificación de cada función, sin retoques posteriores: es la primera fila
+del estudio, no una fila hecha a mano para que quedara bien.
+
 ---
 
 ## 8. Resultados

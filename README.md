@@ -187,6 +187,9 @@ y dos corpus: uno normal y uno de trampas.
 Los ports pasan el 100% del corpus normal y fallan 15 de las 24 trampas. Eso es
 el proyecto entero en una frase: **funcionar no es ser equivalente**.
 
+Los tres ports de Rust los escribió un asistente de IA en una pasada, sin
+retoques: son la primera fila del estudio, no código preparado para lucirse.
+
 ## El estudio
 
 `estudio/` mide ports generados por modelos contra los mismos corpus:
