@@ -1,5 +1,7 @@
 # fiel
 
+![fiel](https://github.com/Barbarno/fiel/actions/workflows/fiel.yml/badge.svg)
+
 **La equivalencia no se demuestra una vez. Se mantiene.**
 
 `fiel` vigila un port —una reescritura de código de un lenguaje a otro— y falla el
@@ -187,6 +189,26 @@ cd examples/rust-demo/rust-port
 cargo build --release --target x86_64-pc-windows-gnu   # Linux/macOS: cargo build --release
 cd .. && fiel check
 ```
+
+En el CI se compila y se comprueba en cada push, con
+`examples/rust-demo/fiel.linux.toml` (misma pareja, distinta ruta de binario).
+Ese fichero existe porque Windows añade `.exe` y compila en un subdirectorio por
+tripleta; el `--spec` permite elegir el que corresponda sin duplicar el corpus.
+
+## La puerta en rojo, con pruebas
+
+El repositorio incluye la demostración hecha de verdad: el
+[pull request #1](https://github.com/Barbarno/fiel/pull/1) cambia una línea del
+port fiel a propósito, y el check `fidelidad` se pone en rojo diciendo el caso
+exacto:
+
+```
+fidelidad  Comprobar fidelidad del ejemplo
+cron-fiel: 8/10 fieles  [2 divergencias]
+##[error]divergencia output: original=5,6,7,8,9 port=5,6,7,8
+```
+
+El PR se cerró sin fusionar para dejar `main` en verde. El registro queda ahí.
 
 ## Pruebas
 

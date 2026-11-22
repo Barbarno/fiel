@@ -7,6 +7,7 @@ on:
 
 jobs:
   fidelidad:
+    name: motor y ejemplo en python
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,3 +24,27 @@ jobs:
 
       - name: Comprobar fidelidad del ejemplo
         run: fiel --root examples/demo check --format github --no-baseline --pair cron-fiel
+
+  rust:
+    name: port real en rust
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar fiel
+        run: pip install .
+
+      - name: Compilar el port
+        run: cargo build --release
+        working-directory: examples/rust-demo/rust-port
+
+      - name: Pruebas del port
+        run: cargo test --release
+        working-directory: examples/rust-demo/rust-port
+
+      - name: Comprobar equivalencia con el original
+        run: fiel --root examples/rust-demo --spec fiel.linux.toml check --format github --no-baseline

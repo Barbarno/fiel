@@ -1,0 +1,20 @@
+# Variante para Linux y macOS, usada por el CI.
+#
+# La diferencia con fiel.toml es solo la ruta del binario: Windows anade .exe
+# y compila en un subdirectorio por tripleta, Linux y macOS no.
+#
+# En el CI:
+#   cd examples/rust-demo/rust-port && cargo build --release
+#   fiel --root examples/rust-demo --spec fiel.linux.toml check --no-baseline
+
+[project]
+baseline = "fiel.baseline.json"
+
+[[pair]]
+id = "cron-rust"
+original = { command = ["python3", "original.py"] }
+port = { command = ["rust-port/target/release/cron-rs"] }
+corpus = "corpus/cron.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"

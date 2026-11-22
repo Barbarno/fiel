@@ -42,7 +42,7 @@ def cmd_init(args: argparse.Namespace) -> int:
 
 
 def cmd_record(args: argparse.Namespace) -> int:
-    project = load(_root(args))
+    project = load(_root(args), args.spec)
     selected = [p for p in project.pairs if args.pair is None or p.id in args.pair]
     if not selected:
         print("ninguna pareja coincide", file=sys.stderr)
@@ -56,7 +56,7 @@ def cmd_record(args: argparse.Namespace) -> int:
 
 def cmd_check(args: argparse.Namespace) -> int:
     try:
-        project = load(_root(args))
+        project = load(_root(args), args.spec)
     except SpecError as exc:
         print(f"fiel: {exc}", file=sys.stderr)
         return EXIT_ERROR
@@ -126,7 +126,7 @@ def _as_json(result, known, fresh, strict: bool) -> dict:
 
 
 def cmd_baseline(args: argparse.Namespace) -> int:
-    project = load(_root(args))
+    project = load(_root(args), args.spec)
     result = check_mod.check(project, pairs=args.pair, jobs=args.jobs)
     if result.errors:
         for error in result.errors:
@@ -174,7 +174,7 @@ def cmd_bisect(args: argparse.Namespace) -> int:
 
 
 def cmd_add(args: argparse.Namespace) -> int:
-    project = load(_root(args))
+    project = load(_root(args), args.spec)
     selected = [p for p in project.pairs if args.pair is None or p.id in args.pair]
     if len(selected) != 1:
         print("fiel add necesita exactamente una pareja (--pair)", file=sys.stderr)
@@ -249,7 +249,7 @@ def cmd_comment(args: argparse.Namespace) -> int:
 
 
 def _build_markdown(args: argparse.Namespace) -> str:
-    project = load(_root(args))
+    project = load(_root(args), args.spec)
     result = check_mod.check(project, pairs=args.pair, jobs=args.jobs)
     baseline = check_mod.load_baseline(project.baseline_path())
     known, fresh = check_mod.split_by_baseline(result, baseline)
@@ -265,6 +265,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="fiel", description="mantiene un port fiel a su original")
     parser.add_argument("--version", action="version", version=f"fiel {__version__}")
     parser.add_argument("--root", default=".", help="raiz del proyecto (por defecto: .)")
+    parser.add_argument("--spec", default="fiel.toml", help="fichero de especificacion (por defecto: fiel.toml)")
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_init = sub.add_parser("init", help="crea fiel.toml")
