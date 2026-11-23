@@ -140,7 +140,7 @@ fiel/
 └── cli.py          los comandos
 ```
 
-1.561 líneas de motor, 49 pruebas automáticas, cero dependencias externas.
+2.642 líneas de motor, 66 pruebas automáticas, cero dependencias externas.
 
 ### 6.2 Los comandos
 
@@ -188,7 +188,7 @@ formato y la herramienta sería inservible.
 
 ### 7.1 Pruebas automáticas
 
-49 pruebas unitarias sobre el motor: comparación, normalización, corpus,
+66 pruebas unitarias sobre el motor: comparación, normalización, corpus,
 baseline, importación, informe y CLI. Se ejecutan en menos de un segundo.
 
 ### 7.2 Integración continua

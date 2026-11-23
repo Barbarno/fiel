@@ -399,7 +399,7 @@ El PR se cerró sin fusionar para dejar `main` en verde. El registro queda ahí.
 python -m unittest discover -s tests -v
 ```
 
-41 pruebas, sin dependencias externas.
+66 pruebas, sin dependencias externas.
 
 ## Qué no hace
 
