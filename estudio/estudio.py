@@ -114,6 +114,72 @@ def _measure_generated(model_dir: Path) -> dict[str, object] | None:
     }
 
 
+def _fila_real() -> dict[str, object] | None:
+    """Dos bibliotecas reales del mismo estandar, medidas con el mismo motor."""
+    semver_rs = (
+        ROOT
+        / "examples"
+        / "real-semver"
+        / "rust-port"
+        / "target"
+        / "x86_64-pc-windows-gnu"
+        / "release"
+        / "semver-rs.exe"
+    )
+    if not semver_rs.is_file():
+        return None
+    original = Endpoint(command=("python", "examples/real-semver/original.py"))
+    port = Endpoint(command=(str(semver_rs),))
+    normal = check_mod.check(
+        Project(
+            root=ROOT,
+            pairs=(
+                Pair(
+                    id="semver-real",
+                    original=original,
+                    port=port,
+                    corpus="examples/real-semver/corpus/semver.jsonl",
+                    normalize="text",
+                    errors="ignore",
+                    timeout_ms=10000,
+                ),
+            ),
+        ),
+        jobs=4,
+    )
+    traps = check_mod.check(
+        Project(
+            root=ROOT,
+            pairs=(
+                Pair(
+                    id="semver-real-trampas",
+                    original=original,
+                    port=port,
+                    corpus="examples/real-semver/corpus/traps.jsonl",
+                    normalize="text",
+                    errors="ignore",
+                    timeout_ms=10000,
+                ),
+            ),
+        ),
+        jobs=4,
+    )
+    return {
+        "modelo": "bibliotecas reales (python-semver vs semver-rs)",
+        "casos": normal.total,
+        "fieles": normal.total - normal.failed,
+        "trampas": traps.total,
+        "divergencias": traps.failed,
+        "porcentaje": round(
+            100.0
+            * ((normal.total - normal.failed) + (traps.total - traps.failed))
+            / (normal.total + traps.total),
+            1,
+        ),
+        "detalle": {"semver": (normal.total, normal.total - normal.failed, traps.total, traps.failed)},
+    }
+
+
 def cmd_medir(args: argparse.Namespace) -> int:
     filas: list[dict[str, object]] = []
 
@@ -125,6 +191,10 @@ def cmd_medir(args: argparse.Namespace) -> int:
         traps = check_mod.check(Project(root=ROOT, pairs=(_pair(target, "-trampas", port),)), jobs=4)
         detalle[target] = (normal.total, normal.total - normal.failed, traps.total, traps.failed)
     filas.append(_resumen("port de IA (Rust, una pasada)", detalle))
+
+    real = _fila_real()
+    if real:
+        filas.append(real)
 
     base = ESTUDIO / "salidas"
     if base.is_dir():

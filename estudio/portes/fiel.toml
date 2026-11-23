@@ -1,0 +1,50 @@
+[project]
+baseline = "fiel.baseline.json"
+
+[[pair]]
+id = "csv"
+original = { command = ["python", "original.py"], cwd = "csv" }
+port = { command = ["python", "port.py"], cwd = "csv" }
+corpus = "csv/corpus/csv.jsonl"
+timeout_ms = 5000
+normalize = "text"
+
+[[pair]]
+id = "shlex"
+original = { command = ["python", "original.py"], cwd = "shlex" }
+port = { command = ["python", "port.py"], cwd = "shlex" }
+corpus = "shlex/corpus/shlex.jsonl"
+timeout_ms = 5000
+normalize = "text"
+
+[[pair]]
+id = "url"
+original = { command = ["python", "original.py"], cwd = "url" }
+port = { command = ["python", "port.py"], cwd = "url" }
+corpus = "url/corpus/url.jsonl"
+timeout_ms = 5000
+normalize = "text"
+
+[[pair]]
+id = "wrap"
+original = { command = ["python", "original.py"], cwd = "wrap" }
+port = { command = ["python", "port.py"], cwd = "wrap" }
+corpus = "wrap/corpus/wrap.jsonl"
+timeout_ms = 5000
+normalize = "text"
+
+[[pair]]
+id = "ip"
+original = { command = ["python", "original.py"], cwd = "ip" }
+port = { command = ["python", "port.py"], cwd = "ip" }
+corpus = "ip/corpus/ip.jsonl"
+timeout_ms = 5000
+normalize = "text"
+
+[[pair]]
+id = "casefold"
+original = { command = ["python", "original.py"], cwd = "casefold" }
+port = { command = ["python", "port.py"], cwd = "casefold" }
+corpus = "casefold/corpus/casefold.jsonl"
+timeout_ms = 5000
+normalize = "text"

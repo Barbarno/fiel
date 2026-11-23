@@ -110,3 +110,32 @@ corpus = "examples/targets/slug/corpus/traps.jsonl"
 timeout_ms = 10000
 normalize = "text"
 errors = "ignore"
+
+# --- dos bibliotecas reales del mismo estandar ------------------------------
+
+[[pair]]
+id = "semver-real"
+original = { command = ["python", "examples/real-semver/original.py"] }
+port = { command = ["examples/real-semver/rust-port/target/x86_64-pc-windows-gnu/release/semver-rs.exe"] }
+corpus = "examples/real-semver/corpus/semver.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "semver-real-trampas"
+original = { command = ["python", "examples/real-semver/original.py"] }
+port = { command = ["examples/real-semver/rust-port/target/x86_64-pc-windows-gnu/release/semver-rs.exe"] }
+corpus = "examples/real-semver/corpus/traps.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "semver-real-fijo"
+original = { command = ["python", "examples/real-semver/original.py"] }
+port = { command = ["examples/real-semver/rust-port/target/x86_64-pc-windows-gnu/release/precedence.exe"] }
+corpus = "examples/real-semver/corpus/orden.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"

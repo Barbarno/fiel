@@ -93,8 +93,18 @@ def _run_pair(
         cases = [c for c in cases if c.id in case_filter]
 
     def work(case: corpus_mod.Case):
-        original = run(pair.original.resolved(), case.input, pair.timeout_ms, project.root)
-        port = run(pair.port.resolved(), case.input, pair.timeout_ms, project.root)
+        original = run(
+            pair.original.resolved(),
+            case.input,
+            pair.timeout_ms,
+            pair.original.working_dir(project.root),
+        )
+        port = run(
+            pair.port.resolved(),
+            case.input,
+            pair.timeout_ms,
+            pair.port.working_dir(project.root),
+        )
         return case, original, port
 
     with ThreadPoolExecutor(max_workers=max(1, jobs)) as pool:
@@ -163,7 +173,12 @@ def record(project: Project, pair: Pair, jobs: int = 4) -> tuple[int, int]:
     previous = {c.id: (c.status, c.output) for c in cases if c.recorded}
 
     def work(case: corpus_mod.Case):
-        return case, run(pair.original.resolved(), case.input, pair.timeout_ms, project.root)
+        return case, run(
+            pair.original.resolved(),
+            case.input,
+            pair.timeout_ms,
+            pair.original.working_dir(project.root),
+        )
 
     with ThreadPoolExecutor(max_workers=max(1, jobs)) as pool:
         futures = [pool.submit(work, case) for case in cases]

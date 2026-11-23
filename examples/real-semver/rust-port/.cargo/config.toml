@@ -1,0 +1,4 @@
+# Sin Visual Studio Build Tools, se usa el enlazador de MinGW que ya esta
+# instalado. En Linux o macOS este fichero no hace falta.
+[target.x86_64-pc-windows-gnu]
+linker = "gcc"

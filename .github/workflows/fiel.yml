@@ -70,3 +70,25 @@ jobs:
 
       - name: Comprobar equivalencia
         run: fiel --spec fiel.linux.toml check --format github --no-baseline
+
+  semver:
+    name: dos bibliotecas reales
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Instalar fiel y la biblioteca original
+        run: pip install . semver
+
+      - name: Compilar el port
+        run: cargo build --release
+        working-directory: examples/real-semver/rust-port
+
+      - name: Comprobar equivalencia
+        run: |
+          fiel --root examples/real-semver --spec fiel.linux.toml check \
+            --format github --no-baseline --pair semver-real --pair semver-real-fijo

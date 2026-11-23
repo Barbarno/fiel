@@ -31,6 +31,13 @@ class Endpoint:
             cmd[0] = sys.executable
         return cmd
 
+    def working_dir(self, root: Path) -> Path:
+        """Directorio desde el que se ejecuta este lado de la pareja."""
+        if not self.cwd:
+            return root
+        candidate = Path(self.cwd)
+        return candidate if candidate.is_absolute() else root / candidate
+
 
 @dataclass(frozen=True)
 class Pair:
@@ -77,8 +84,8 @@ def load(root: Path, name: str = "fiel.toml") -> Project:
     path = root / name
     if not path.is_file():
         raise SpecError(f"no encuentro {path}")
-    with path.open("rb") as handle:
-        data = tomllib.load(handle)
+    with path.open("r", encoding="utf-8-sig") as handle:
+        data = tomllib.loads(handle.read())
 
     raw_pairs = data.get("pair")
     if not isinstance(raw_pairs, list) or not raw_pairs:

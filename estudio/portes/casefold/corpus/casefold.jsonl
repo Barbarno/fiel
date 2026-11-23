@@ -1,0 +1,6 @@
+{"id": "casefold001", "input_b64": "SE9MQQ==", "output_b64": "aG9sYQ0K", "status": "ok"}
+{"id": "casefold002", "input_b64": "TXVuZG8=", "output_b64": "bXVuZG8NCg==", "status": "ok"}
+{"id": "casefold003", "input_b64": "YWJj", "output_b64": "YWJjDQo=", "status": "ok"}
+{"id": "casefold004", "input_b64": "VGVzdA==", "output_b64": "dGVzdA0K", "status": "ok"}
+{"id": "casefold005", "input_b64": "QVJCT0w=", "output_b64": "YXJib2wNCg==", "status": "ok"}
+{"id": "casefold006", "input_b64": "Y2FzYQ==", "output_b64": "Y2FzYQ0K", "status": "ok"}

@@ -1,0 +1,24 @@
+# Variante para Linux y macOS: los binarios no llevan .exe y viven en
+# target/release. Se comprueban las dos parejas verdes; las trampas se quedan
+# fuera del CI porque estan para fallar y ensenar el hallazgo.
+
+[project]
+baseline = "fiel.baseline.json"
+
+[[pair]]
+id = "semver-real"
+original = { command = ["python", "original.py"] }
+port = { command = ["rust-port/target/release/semver-rs"] }
+corpus = "corpus/semver.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "semver-real-fijo"
+original = { command = ["python", "original.py"] }
+port = { command = ["rust-port/target/release/precedence"] }
+corpus = "corpus/orden.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"

@@ -149,12 +149,66 @@ idempotente listo para publicar.
 | `fiel import` | trae un corpus de otra herramienta (JSONL tolerante) |
 | `fiel baseline` | acepta las divergencias actuales (`--prune` limpia las resueltas) |
 | `fiel bisect --since <ref>` | encuentra el commit que rompió la fidelidad |
+| `fiel adequacy` | mide qué parte del comportamiento deja sin comprobar el corpus |
+| `fiel gate` | comprueba que el port no está llamando al original por debajo |
 | `fiel comment` | publica o actualiza el informe en un pull request |
 | `fiel report` | escribe un informe HTML en un solo fichero (`--out`, `--open`) |
 | `fiel demo` | la historia completa, sin preparar nada |
 
 Opciones útiles de `check`: `--pair`, `--case`, `--jobs`, `--strict` (ignora el
 baseline), `--no-baseline`, `--format console|markdown|github|json`.
+
+## Lo que el corpus no cubre
+
+Un corpus demuestra que el port coincide **en los casos grabados**. No dice nada
+de los que no están. Las herramientas de migración con IA lo admiten con estas
+palabras: *"solo detecta lo que cubre la grabación"*.
+
+`fiel adequacy` mide ese hueco sin instrumentar nada y sin saber en qué lenguaje
+está escrito el original:
+
+1. Cada salida se reduce a una **forma**: estado, esqueleto del texto y tamaño.
+   `5,6,7` y `1,2,3` son la misma forma; `error: no` es otra.
+2. Se generan sondas deterministas a partir de las entradas del corpus: vacío,
+   truncados, duplicados, delimitadores, desplazamiento de un byte, límites
+   numéricos, Unicode.
+3. Las formas que el corpus nunca produjo son **comportamiento no verificado**:
+   ahí el port puede hacer lo que quiera y `fiel check` no dirá nada.
+4. Se ejecuta el port sobre esas sondas. Cada diferencia es un fallo real que el
+   corpus no estaba viendo.
+
+```
+$ fiel --root examples/targets/url adequacy
+url: 40 casos cubren 36/180 formas de comportamiento (20.0%)
+  144 formas sin verificar, 16 divergencias encontradas fuera del corpus
+    [output] caso probe00059: original='http|-|example.com|-|/|-|-' port='http|-|example.com|80||-|-'
+```
+
+Dieciséis fallos que pasaban el `check` con nota perfecta. Eso es el número que
+ninguna otra herramienta de este espacio publica.
+
+Con `--write-unverified corpus/nuevas.jsonl` deja esas sondas listas para
+`fiel record`, y el corpus crece justo por donde estaba ciego.
+
+## El port no llama al original
+
+Un port puede pasar los 40 casos sin reimplementar nada:
+
+```python
+subprocess.run([sys.executable, "original.py"], input=data)
+```
+
+`fiel gate` comprueba la definición literal de independencia: esconde los
+ficheros del original, vuelve a ejecutar el port y mira si los casos que antes
+pasaban siguen pasando. Si se rompen, el port dependía del original.
+
+```
+$ fiel gate
+cron-fiel: independiente - 6 casos siguen pasando sin el original
+tramposo: DEPENDIENTE - 1 de 1 casos se rompen al esconder el original
+```
+
+Los ficheros se restauran siempre, incluso si el port se cuelga.
 
 ## El informe
 
@@ -170,7 +224,8 @@ La especificación `fiel.demo.toml` junta cuatro parejas —el port bueno, el ro
 el de Rust y los tres casos trampa— para que el informe enseñe el sistema
 completo: 33 casos, 28 fieles y 5 divergencias con su entrada exacta.
 
-Y `fiel.estudio.toml` junta los cuatro targets: **177 comprobaciones, 20 divergencias**.
+Y `fiel.estudio.toml` junta los cuatro targets y el ejemplo real:
+**230 comprobaciones, 25 divergencias**.
 
 ## Los cuatro targets
 
@@ -189,6 +244,33 @@ el proyecto entero en una frase: **funcionar no es ser equivalente**.
 
 Los tres ports de Rust los escribió un asistente de IA en una pasada, sin
 retoques: son la primera fila del estudio, no código preparado para lucirse.
+
+## Dos bibliotecas reales
+
+El quinto ejemplo no compara una función escrita aquí con su traducción.
+Compara dos bibliotecas mantenidas por otras personas que implementan el mismo
+estándar, SemVer 2.0.0: [`semver` de Python](https://pypi.org/project/semver/)
+contra [`semver` de Rust](https://crates.io/crates/semver).
+
+El estándar dice que la metadata de build **no** cuenta para el orden. Las dos
+lo cumplen, pero con nombres distintos: Python lo hace en `semver.compare`;
+Rust lo hace en `cmp_precedence`, y su `cmp` normal **sí** compara el build.
+
+Un port mecánico traduce lo obvio y cambia el orden:
+
+```
+1.0.0+build2  vs  1.0.0+build1
+  python-semver -> 0   (misma precedencia)
+  semver-rs     -> 1   (build2 es mayor)
+```
+
+```
+semver-real:          40/40 fieles  [OK]
+semver-real-trampas:   3/8  fieles  [5 divergencias]
+semver-real-fijo:      5/5  fieles  [OK]   <- con cmp_precedence
+```
+
+Detalle en [`examples/real-semver/README.md`](examples/real-semver/README.md).
 
 ## El estudio
 

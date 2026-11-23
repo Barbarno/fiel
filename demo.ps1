@@ -98,11 +98,24 @@ try {
     Comando "python -m fiel --spec fiel.estudio.toml report --out informe.html --open"
     Fiel --spec fiel.estudio.toml report --out informe.html --open
     Write-Host ""
-    Write-Host "  177 casos, 20 divergencias, cada una con su entrada exacta." -ForegroundColor Green
+    Write-Host "  230 casos, 25 divergencias, cada una con su entrada exacta." -ForegroundColor Green
     Pausa
 
     # ---------------------------------------------------------------
-    Paso "8. El registro: un pull request real con el check en rojo"
+    Paso "8. Dos bibliotecas reales del mismo estandar"
+    Comando "python -m fiel --root examples/real-semver check --pair semver-real-trampas"
+    Fiel --root examples/real-semver check --pair semver-real-trampas
+    Write-Host ""
+    Write-Host "  python-semver dice 0 (misma precedencia); semver-rs dice 1." -ForegroundColor DarkYellow
+    Pausa "Enter para ver el arreglo"
+    Comando "python -m fiel --root examples/real-semver check --pair semver-real-fijo"
+    Fiel --root examples/real-semver check --pair semver-real-fijo
+    Write-Host ""
+    Write-Host "  cmp -> cmp_precedence: una linea, cero divergencias." -ForegroundColor Green
+    Pausa
+
+    # ---------------------------------------------------------------
+    Paso "9. El registro: un pull request real con el check en rojo"
     $url = "https://github.com/Barbarno/fiel/pull/1"
     Write-Host ""
     Write-Host "  $url" -ForegroundColor Blue

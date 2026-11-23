@@ -164,9 +164,10 @@ fiel --spec fiel.estudio.toml report --out informe.html --open
 Se abre el navegador con el informe. Señala las cuatro tarjetas de arriba y una
 divergencia cualquiera.
 
-> "Todo lo que han visto en la consola, aquí. Cuatro funciones, diez parejas,
-> 177 comprobaciones y 20 divergencias, cada una con la entrada exacta que la
-> provocó: `5-9`, `1_0`, `Café`, un número de veinte cifras.
+> "Todo lo que han visto en la consola, aquí. Cuatro funciones, un ejemplo con
+> bibliotecas reales, 230 comprobaciones y 25 divergencias, cada una con la
+> entrada exacta que la provocó: `5-9`, `1_0`, `Café`, un número de veinte
+> cifras.
 > Sin javascript y sin conexión: el fichero se adjunta a la memoria y se abre
 > en cualquier ordenador."
 
@@ -175,7 +176,38 @@ fichero desde la carpeta.
 
 ---
 
-## Acto 8 — El registro (30 segundos)
+## Acto 8 — Dos bibliotecas reales (40 segundos)
+
+```powershell
+fiel --root examples/real-semver check --pair semver-real-trampas
+```
+
+```
+semver-real-trampas: 3/8 fieles  [5 divergencias]
+  caso u0001: original='0' port='-1'
+```
+
+> "Esto no es un ejemplo mío. Son dos bibliotecas reales del mismo estándar:
+> la de Python y la de Rust. Para el estándar, dos versiones que solo cambian
+> en la metadata de build son iguales. Python lo hace así; el crate de Rust,
+> con su comparación normal, no.
+> Un port mecánico traduce `compare` por `cmp` y cambia el orden. Los 40 casos
+> normales no lo ven. Estos tres, sí."
+
+Y el arreglo:
+
+```powershell
+fiel --root examples/real-semver check --pair semver-real-fijo
+```
+
+> "La corrección es cambiar `cmp` por `cmp_precedence`. Una línea. Cero
+> divergencias.
+> Eso es lo que hace útil a la herramienta: no señala un problema, señala el
+> arreglo."
+
+---
+
+## Acto 9 — El registro (30 segundos)
 
 Cambia a la pestaña del navegador con el pull request.
 
@@ -231,13 +263,15 @@ Fin. No digas nada más. Deja que pregunten.
 > fidelidad no tiene por qué ser monótona y una búsqueda binaria puede mentir.
 
 **"¿Cuánto tarda?"**
-> Diez casos en menos de un segundo. El ejemplo completo, tres segundos. En
-> GitHub, ocho segundos el job entero.
+> Los 230 casos, tres segundos. La demo entera, menos de dos. En GitHub, el
+> trabajo completo tarda entre veinte y treinta segundos, y la mayoría es
+> instalar y compilar.
 
 **"¿Qué harías con más tiempo?"**
-> Un segundo y tercer target (parser de URL, TOML) para tener una tabla con más
-> números, y el adaptador específico del corpus de `rust-anything` para
-> integrarlo en su proyecto en vez de solo ser compatible.
+> Completar el estudio con dos modelos gratuitos más (el generador ya está
+> hecho; faltan las claves), y adaptar el corpus de `rust-anything` para medir
+> ports que no sean míos. Lo que no haría es añadir funciones: cuatro ya
+> demuestran el patrón y el quinto ejemplo usa bibliotecas reales.
 
 ---
 

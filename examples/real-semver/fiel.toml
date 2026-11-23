@@ -1,0 +1,45 @@
+# Ejemplo real: dos bibliotecas del mismo estandar, no una funcion escrita aqui.
+#
+#   original.py  ->  paquete `semver` de Python   (pip install semver)
+#   rust-port    ->  crate `semver` de Rust       (cargo, ya en Cargo.toml)
+#
+# Los tres corpus:
+#   normal.txt  40 casos en los que las dos coinciden
+#   traps.txt    8 casos donde no (5 divergencias reales)
+#   orden.txt    3 casos de orden + 2 controles, para el port corregido
+#
+# Compilar:
+#   cd rust-port && cargo build --release --target x86_64-pc-windows-gnu
+#
+# El binario corregido es rust-port/target/.../precedence.exe y usa
+# cmp_precedence, la comparacion que define el estandar.
+
+[project]
+baseline = "fiel.baseline.json"
+
+[[pair]]
+id = "semver-real"
+original = { command = ["python", "original.py"] }
+port = { command = ["rust-port/target/x86_64-pc-windows-gnu/release/semver-rs.exe"] }
+corpus = "corpus/semver.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "semver-real-trampas"
+original = { command = ["python", "original.py"] }
+port = { command = ["rust-port/target/x86_64-pc-windows-gnu/release/semver-rs.exe"] }
+corpus = "corpus/traps.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "semver-real-fijo"
+original = { command = ["python", "original.py"] }
+port = { command = ["rust-port/target/x86_64-pc-windows-gnu/release/precedence.exe"] }
+corpus = "corpus/orden.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"

@@ -9,6 +9,7 @@ función. Las demás filas aparecen al ejecutar `generar` con un modelo.
 | modelo | casos normales | fieles | trampas | divergencias en trampas | % fiel |
 |---|---|---|---|---|---|
 | port de IA (Rust, una pasada) | 120 | 120 | 24 | 15 | 89.6% |
+| bibliotecas reales (python-semver vs semver-rs) | 40 | 40 | 8 | 5 | 89.6% |
 
 Detalle por target:
 
@@ -17,3 +18,4 @@ Detalle por target:
 | port de IA (Rust, una pasada) | url | 40 | 40 | 9 | 5 |
 | port de IA (Rust, una pasada) | toml | 40 | 40 | 8 | 5 |
 | port de IA (Rust, una pasada) | slug | 40 | 40 | 7 | 5 |
+| bibliotecas reales (python-semver vs semver-rs) | semver | 40 | 40 | 8 | 5 |

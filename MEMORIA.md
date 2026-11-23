@@ -26,8 +26,9 @@ No opina: ejecuta las mismas entradas contra los dos programas y compara las
 salidas.
 
 El proyecto incluye la herramienta, cuatro funciones convertidas en casos de
-uso reales, 167 casos grabados, un estudio con ports escritos por IA y un
-_check_ de GitHub que bloquea un pull request cuando la equivalencia se rompe.
+uso reales, un ejemplo con dos bibliotecas reales, 220 casos grabados, un
+estudio con ports escritos por IA y un _check_ de GitHub que bloquea un pull
+request cuando la equivalencia se rompe.
 
 ---
 
@@ -229,6 +230,33 @@ Los tres ports de Rust los escribió un asistente de IA a partir de la
 especificación de cada función, sin retoques posteriores: es la primera fila
 del estudio, no una fila hecha a mano para que quedara bien.
 
+### 7.5 Dos bibliotecas reales
+
+El quinto ejemplo sube un escalón: en vez de comparar una función propia con su
+traducción, compara dos bibliotecas mantenidas por otras personas que
+implementan el mismo estándar, SemVer 2.0.0: `semver` 3.1.2 de Python contra
+`semver` 1.0.28 de Rust.
+
+El estándar dice, en el punto 10, que la metadata de build no cuenta para el
+orden de versiones. Las dos bibliotecas lo cumplen, pero lo exponen distinto:
+Python lo hace en `semver.compare`; el crate de Rust lo hace en
+`cmp_precedence`, y su `cmp` normal sí compara el build.
+
+Un port mecánico traduce `semver.compare(a, b)` a `a.cmp(&b)`. Compila, pasa los
+40 casos normales y **cambia el orden** de las versiones que solo difieren en
+build. fiel lo detecta en los tres casos del corpus de trampas, y el port
+corregido con `cmp_precedence` las pasa todas:
+
+```
+semver-real:          40/40 fieles  [OK]
+semver-real-trampas:   3/8  fieles  [5 divergencias]
+semver-real-fijo:      5/5  fieles  [OK]
+```
+
+Es el hallazgo más fuerte del proyecto: no es un fallo inventado en un ejemplo,
+es una diferencia real entre dos implementaciones del mismo estándar, y la
+herramienta la encuentra sola.
+
 ---
 
 ## 8. Resultados
@@ -245,10 +273,13 @@ del estudio, no una fila hecha a mano para que quedara bien.
 | toml-trampas | 8 | 3 | 5 |
 | slug | 40 | 40 | 0 |
 | slug-trampas | 7 | 2 | 5 |
-| **total** | **177** | **157** | **20** |
+| semver-real | 40 | 40 | 0 |
+| semver-real-trampas | 8 | 3 | 5 |
+| semver-real-fijo | 5 | 5 | 0 |
+| **total** | **230** | **205** | **25** |
 
-Casos únicos grabados: **167**. Comprobaciones por vuelta: **177** (el corpus
-del ejemplo del rango lo usan dos parejas). Divergencias encontradas: **20**.
+Casos únicos grabados: **220**. Comprobaciones por vuelta: **230** (el corpus
+del ejemplo del rango lo usan dos parejas). Divergencias encontradas: **25**.
 
 Las divergencias no son de sintaxis. Son de comportamiento:
 
@@ -258,6 +289,9 @@ Las divergencias no son de sintaxis. Son de comportamiento:
 - Python quita acentos (`Café` → `cafe`); Rust no.
 - Un navegador trata `http://x:80` igual que `http://x`; un parser ingenuo, no.
 - IPv6 sin puerto rompe un `split(':')` mal hecho.
+- Dos bibliotecas del mismo estándar ordenan distinto dos versiones que solo
+  cambian en la metadata de build: una la ignora (como dice el estándar) y la
+  otra no.
 
 ---
 
@@ -287,16 +321,19 @@ es más creíble que uno que los esconde.
 
 1. La equivalencia no se demuestra una vez. Se mantiene.
 2. Un port que pasa los tests puede no ser equivalente: los cuatro targets lo
-   demuestran con 20 divergencias reales.
+   demuestran con 20 divergencias reales, y dos bibliotecas del mismo estándar
+   añaden otras 5.
 3. La herramienta es pequeña a propósito. Su valor no está en las líneas, sino
    en que produce una respuesta binaria y verificable en cada cambio.
 4. El límite principal no es técnico, es de cobertura: el corpus es el activo.
+5. Cuando dos implementaciones del mismo estándar discrepan, ninguna de las dos
+   lo sabe. Hace falta un tercero que las ejecute y las compare.
 
 ---
 
 ## 11. Trabajo futuro
 
-- Añadir más targets (semver, CSV, expresiones regulares).
+- Añadir más targets (CSV, expresiones regulares, fechas).
 - Completar el estudio con tres modelos gratuitos y 108 generaciones.
 - Publicar la acción en GitHub Marketplace.
 - Adaptar el corpus de `rust-anything` para medir ports que no sean propios.
@@ -381,3 +418,6 @@ Riesgos y cómo se resolvieron:
 - Documentación de GitHub Actions.
 - Documentación de Python 3.11 (`subprocess`, `json`, `base64`, `unicodedata`).
 - Documentación de Rust (`std::io`, `parse`, `String`).
+- Especificación SemVer 2.0.0: `https://semver.org`
+- `semver` para Python: `https://pypi.org/project/semver/`
+- `semver` para Rust: `https://docs.rs/semver/latest/semver/struct.Version.html`

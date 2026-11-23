@@ -9,8 +9,10 @@ from pathlib import Path
 
 from . import __version__
 from . import adapters
+from . import adequacy as adequacy_mod
 from . import check as check_mod
 from . import corpus as corpus_mod
+from . import gate as gate_mod
 from . import mutate
 from .bisect import BisectError, run_bisect
 from .bot import BotError, resolve_token, upsert_comment
@@ -292,6 +294,51 @@ def cmd_report(args: argparse.Namespace) -> int:
     return EXIT_DIVERGENCE if fresh else EXIT_OK
 
 
+def cmd_adequacy(args: argparse.Namespace) -> int:
+    project = load(_root(args), args.spec)
+    try:
+        result = adequacy_mod.measure(project, pairs=args.pair, budget=args.budget)
+    except (ValueError, corpus_mod.CorpusError) as exc:
+        print(f"fiel: {exc}", file=sys.stderr)
+        return EXIT_ERROR
+
+    if args.format == "json":
+        print(json.dumps(adequacy_mod.as_json(result), indent=2, ensure_ascii=False))
+    elif args.format == "markdown":
+        print(adequacy_mod.markdown(result))
+    else:
+        print(adequacy_mod.console(result))
+
+    if result.errors:
+        return EXIT_ERROR
+    if args.write_unverified:
+        target = _root(args) / args.write_unverified
+        added = adequacy_mod.write_unverified(result, target)
+        print(f"{added} sondas anadidas a {target}")
+        print("siguiente: 'fiel record' para grabarlas")
+    if args.fail_on_unverified and result.divergences:
+        return EXIT_DIVERGENCE
+    return EXIT_OK
+
+
+def cmd_gate(args: argparse.Namespace) -> int:
+    project = load(_root(args), args.spec)
+    try:
+        result = gate_mod.check(project, pairs=args.pair, sample=args.sample)
+    except ValueError as exc:
+        print(f"fiel: {exc}", file=sys.stderr)
+        return EXIT_ERROR
+
+    if args.format == "json":
+        print(json.dumps(gate_mod.as_json(result), indent=2, ensure_ascii=False))
+    else:
+        print(gate_mod.console(result))
+
+    if result.errors:
+        return EXIT_ERROR
+    return EXIT_DIVERGENCE if result.dependent else EXIT_OK
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="fiel", description="mantiene un port fiel a su original")
     parser.add_argument("--version", action="version", version=f"fiel {__version__}")
@@ -366,6 +413,20 @@ def build_parser() -> argparse.ArgumentParser:
     p_report.add_argument("--no-baseline", action="store_true")
     add_common(p_report)
     p_report.set_defaults(func=cmd_report)
+
+    p_adeq = sub.add_parser("adequacy", help="mide cuanto deja sin comprobar el corpus")
+    add_common(p_adeq)
+    p_adeq.add_argument("--budget", type=int, default=400, help="sondas por pareja (por defecto: 400)")
+    p_adeq.add_argument("--format", choices=["console", "markdown", "json"], default="console")
+    p_adeq.add_argument("--write-unverified", help="anade las sondas sin verificar a este corpus de semillas")
+    p_adeq.add_argument("--fail-on-unverified", action="store_true", help="exit 1 si hay divergencias fuera del corpus")
+    p_adeq.set_defaults(func=cmd_adequacy)
+
+    p_gate = sub.add_parser("gate", help="comprueba que el port no llama al original")
+    add_common(p_gate)
+    p_gate.add_argument("--sample", type=int, default=20, help="casos a comprobar (por defecto: 20)")
+    p_gate.add_argument("--format", choices=["console", "json"], default="console")
+    p_gate.set_defaults(func=cmd_gate)
 
     return parser
 

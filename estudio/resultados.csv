@@ -2,3 +2,4 @@ modelo,target,casos,fieles,trampas,divergencias
 "port de IA (Rust, una pasada)",url,40,40,9,5
 "port de IA (Rust, una pasada)",toml,40,40,8,5
 "port de IA (Rust, una pasada)",slug,40,40,7,5
+bibliotecas reales (python-semver vs semver-rs),semver,40,40,8,5
