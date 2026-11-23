@@ -199,7 +199,7 @@ jobs:
       - name: Una linea que rompe el port detiene el commit
         run: |
           cd "$RUNNER_TEMP/puerta"
-          printf '\nraise SystemExit(3)\n' >> port.py
+          printf '\n# una linea que cambia el resultado de todas las entradas\nparse = lambda expr: [0]\n' >> port.py
           git add -A
           set +e
           git commit -qm "roto" 2>&1 | tee salida.txt
