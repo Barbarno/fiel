@@ -227,6 +227,11 @@ completo: 33 casos, 28 fieles y 5 divergencias con su entrada exacta.
 Y `fiel.estudio.toml` junta los cinco ejemplos y las seis reescrituras a mano:
 **312 comprobaciones, 66 divergencias**.
 
+El resultado ya está generado en el repositorio, para que no haya que ejecutar
+nada para verlo: [`informe-ejemplo.html`](informe-ejemplo.html). Un solo fichero
+de 28 KB, sin javascript, sin fuentes externas y sin conexión. Se abre desde
+GitHub dándole a *Raw* o descargándolo.
+
 ## Los cuatro targets
 
 Cada target es una función distinta, con su original en Python, su port en Rust

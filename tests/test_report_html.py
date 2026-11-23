@@ -114,6 +114,25 @@ class ReportHtmlTests(unittest.TestCase):
         self.assertTrue(written.is_file())
         self.assertIn("prueba - informe", written.read_text(encoding="utf-8"))
 
+    def test_el_informe_del_repositorio_sigue_siendo_un_solo_fichero(self) -> None:
+        """El HTML versionado se abre sin conexion: ni scripts ni recursos remotos."""
+        ruta = Path(__file__).resolve().parent.parent / "informe-ejemplo.html"
+        self.assertTrue(ruta.is_file(), "falta informe-ejemplo.html en la raiz")
+
+        html = ruta.read_text(encoding="utf-8")
+        bajo = html.lower()
+        # Los datos del corpus contienen URLs; lo que no puede haber es nada que
+        # el navegador vaya a descargar al abrirlo.
+        self.assertNotIn("<script", bajo)
+        self.assertNotIn("src=", bajo)
+        self.assertNotIn("href=\"http", bajo)
+        self.assertNotIn("href='http", bajo)
+        self.assertNotIn("@import", bajo)
+        self.assertNotIn("url(http", bajo)
+        self.assertLess(len(html.encode("utf-8")), 200_000)
+        self.assertTrue(html.rstrip().endswith("</html>"))
+        self.assertIn("fiel", html)
+
 
 if __name__ == "__main__":
     unittest.main()
