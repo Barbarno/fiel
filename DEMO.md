@@ -1,30 +1,40 @@
 # Guion de la demostración
 
-Duración: **5 minutos** de reloj, 4 de ellos hablando.
+Duración: **unos 6 minutos** de reloj, 5 de ellos hablando. Diez actos.
 Todo pasa en tu portátil. No hace falta internet, ni GitHub, ni permisos.
+El único acto que usa el navegador es el 7 (abre un HTML local) y el 10
+(enseña el pull request ya abierto en otra pestaña).
 
 ---
 
 ## Antes de empezar (5 minutos antes, en el pasillo)
 
 1. Abre una terminal **nueva** en `C:\Users\Dano\Documents\Default Project\fiel`.
-2. Comprueba que responde: `fiel --version` → debe decir `fiel 0.1.0`.
+2. Comprueba que responde: `fiel --version` → debe decir `fiel 0.2.0`.
    Si no responde: `python -m fiel --version` y usa esa forma en todo el guion.
 3. Ten abierta en el navegador, en otra pestaña, esta dirección:
    `https://github.com/Barbarno/fiel/pull/1`
 4. Sube el tamaño de letra de la terminal: **Ctrl + rueda del ratón**. Que se lea desde la última fila.
-5. Comprueba que el port en Rust está compilado:
+5. Comprueba que los binarios en Rust están compilados:
 
 ```powershell
-Test-Path examples\rust-demo\rust-port\target\x86_64-pc-windows-gnu\release\cron-rs.exe
+@(
+  "examples\rust-demo\rust-port\target\x86_64-pc-windows-gnu\release\cron-rs.exe",
+  "examples\targets\url\rust-port\target\x86_64-pc-windows-gnu\release\url-rs.exe",
+  "examples\real-semver\rust-port\target\x86_64-pc-windows-gnu\release\semver-rs.exe",
+  "examples\real-semver\rust-port\target\x86_64-pc-windows-gnu\release\precedence.exe"
+) | ForEach-Object { "$(Test-Path $_)  $_" }
 ```
 
-Debe decir `True`. Si dice `False`:
+Deben salir cuatro `True`. Si alguno dice `False`:
 
 ```powershell
-cd examples\rust-demo\rust-port
-cargo build --release --target x86_64-pc-windows-gnu
+cargo build --release --target x86_64-pc-windows-gnu --manifest-path examples\rust-demo\rust-port\Cargo.toml
+cargo build --release --target x86_64-pc-windows-gnu --manifest-path examples\targets\url\rust-port\Cargo.toml
+cargo build --release --target x86_64-pc-windows-gnu --manifest-path examples\real-semver\rust-port\Cargo.toml
 ```
+
+El acto 9 no necesita compilar nada: son dos scripts de Python.
 
 6. Si algo va mal, tienes el plan B al final de este documento.
 
@@ -290,8 +300,9 @@ Fin. No digas nada más. Deja que pregunten.
 **"¿Qué harías con más tiempo?"**
 > Completar el estudio con dos modelos gratuitos más (el generador ya está
 > hecho; faltan las claves), y adaptar el corpus de `rust-anything` para medir
-> ports que no sean míos. Lo que no haría es añadir funciones: cuatro ya
-> demuestran el patrón y el quinto ejemplo usa bibliotecas reales.
+> ports que no sean míos. Lo que no haría es añadir funciones: cinco ejemplos y
+> seis reescrituras a mano ya cubren los cuatro modos de fallo que me interesan
+> —números, texto, Unicode y decisiones de API.
 
 ---
 
@@ -300,10 +311,11 @@ Fin. No digas nada más. Deja que pregunten.
 | si falla | qué haces |
 |---|---|
 | `fiel` no se reconoce | usa `python -m fiel` en todos los comandos |
-| el binario de Rust no está compilado | salta el acto 5; el acto 6 sigue funcionando y avisa de que falta |
-| no hay internet | los actos 1 a 6 no lo necesitan; el 7 lo cuentas de palabra |
+| un binario de Rust no está compilado | salta ese acto: el 6 avisa de que falta, el 8 solo necesita `semver-rs`, el 9 no compila nada |
+| no hay internet | los actos 1 a 9 no lo necesitan (el 7 abre un HTML local); el 10 lo cuentas de palabra |
 | `fiel demo` falla | ejecuta los actos 2 a 4 a mano; son el 80% de la demo |
-| se te va el tiempo | actos 3 y 6 son los que hay que enseñar sí o sí |
+| el informe no se abre | ejecuta `fiel --spec fiel.estudio.toml report --out informe.html` y ábrelo desde la carpeta |
+| se te va el tiempo | actos 3, 6 y 9 son los que hay que enseñar sí o sí |
 
 ---
 
