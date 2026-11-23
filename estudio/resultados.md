@@ -8,11 +8,11 @@ función. La segunda compara dos bibliotecas reales del mismo estándar. La
 tercera son seis funciones de la biblioteca estándar reescritas a mano.
 Las filas de modelos aparecen al ejecutar `generar` con una clave.
 
-| modelo | casos normales | fieles | trampas | divergencias en trampas | % fiel |
-|---|---|---|---|---|---|
-| port de IA (Rust, una pasada) | 120 | 120 | 24 | 15 | 89.6% |
-| bibliotecas reales (python-semver vs semver-rs) | 40 | 40 | 8 | 5 | 89.6% |
-| reescritura a mano (stdlib, sin dependencias) | 36 | 36 | 46 | 41 | 50.0% |
+| modelo | casos normales | fieles | trampas | divergencias en trampas | % fiel | tiempo |
+|---|---|---|---|---|---|---|
+| port de IA (Rust, una pasada) | 120 | 120 | 24 | 15 | 89.6% | 1.41 s |
+| bibliotecas reales (python-semver vs semver-rs) | 40 | 40 | 8 | 5 | 89.6% | 0.9 s |
+| reescritura a mano (stdlib, sin dependencias) | 36 | 36 | 46 | 41 | 50.0% | 1.48 s |
 
 Detalle por target:
 

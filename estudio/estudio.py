@@ -25,6 +25,7 @@ import json
 import os
 import re
 import sys
+import time
 import tomllib
 import urllib.error
 import urllib.request
@@ -242,20 +243,27 @@ def cmd_medir(args: argparse.Namespace) -> int:
     filas: list[dict[str, object]] = []
 
     # Fila manual: tres binarios distintos, una medicion por target.
+    inicio = time.perf_counter()
     detalle: dict[str, tuple[int, int, int, int]] = {}
     for target, command in MANUALES.items():
         port = Endpoint(command=tuple(command))
         normal = check_mod.check(Project(root=ROOT, pairs=(_pair(target, "", port),)), jobs=4)
         traps = check_mod.check(Project(root=ROOT, pairs=(_pair(target, "-trampas", port),)), jobs=4)
         detalle[target] = (normal.total, normal.total - normal.failed, traps.total, traps.failed)
-    filas.append(_resumen("port de IA (Rust, una pasada)", detalle))
+    fila = _resumen("port de IA (Rust, una pasada)", detalle)
+    fila["segundos"] = round(time.perf_counter() - inicio, 2)
+    filas.append(fila)
 
+    inicio = time.perf_counter()
     real = _fila_real()
     if real:
+        real["segundos"] = round(time.perf_counter() - inicio, 2)
         filas.append(real)
 
+    inicio = time.perf_counter()
     portes = _fila_portes()
     if portes:
+        portes["segundos"] = round(time.perf_counter() - inicio, 2)
         filas.append(portes)
 
     base = ESTUDIO / "salidas"
@@ -291,13 +299,15 @@ def _resumen(nombre: str, detalle: dict[str, tuple[int, int, int, int]]) -> dict
 
 def _markdown(filas: list[dict[str, object]]) -> str:
     lines = [
-        "| modelo | casos normales | fieles | trampas | divergencias en trampas | % fiel |",
-        "|---|---|---|---|---|---|",
+        "| modelo | casos normales | fieles | trampas | divergencias en trampas | % fiel | tiempo |",
+        "|---|---|---|---|---|---|---|",
     ]
     for row in filas:
+        segundos = row.get("segundos")
+        tiempo = f"{segundos} s" if segundos is not None else "-"
         lines.append(
             f"| {row['modelo']} | {row['casos']} | {row['fieles']} | {row['trampas']} | "
-            f"{row['divergencias']} | {row['porcentaje']}% |"
+            f"{row['divergencias']} | {row['porcentaje']}% | {tiempo} |"
         )
     lines.append("")
     lines.append("Detalle por target:")
@@ -328,10 +338,12 @@ def _write(filas: list[dict[str, object]], args: argparse.Namespace) -> None:
     csv_path = ESTUDIO / "resultados.csv"
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["modelo", "target", "casos", "fieles", "trampas", "divergencias"])
+        writer.writerow(["modelo", "target", "casos", "fieles", "trampas", "divergencias", "segundos"])
         for row in filas:
             for target, (casos, fieles, trampas, fallos) in row["detalle"].items():
-                writer.writerow([row["modelo"], target, casos, fieles, trampas, fallos])
+                writer.writerow(
+                    [row["modelo"], target, casos, fieles, trampas, fallos, row.get("segundos", "")]
+                )
     if not args.quiet:
         print(f"\nEscrito {md.relative_to(ROOT)} y {csv_path.relative_to(ROOT)}")
 

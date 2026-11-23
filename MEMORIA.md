@@ -334,6 +334,11 @@ seis parejas está en `estudio/portes/LEEME.md`.
 Casos únicos grabados: **302**. Comprobaciones por vuelta: **312** (el corpus
 del ejemplo del rango lo usan dos parejas). Divergencias encontradas: **66**.
 
+Las tres filas del estudio se miden en **menos de cuatro segundos**: 1,4 s los
+ports de Rust, 0,9 s las dos bibliotecas reales y 1,5 s las seis reescrituras a
+mano. Ese es el dato que permite meter la comprobación en un `pre-commit` sin
+que nadie la quite por lenta.
+
 Las divergencias no son de sintaxis. Son de comportamiento:
 
 - Python acepta `1_0` como 10; Rust no.

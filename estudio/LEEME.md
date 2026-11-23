@@ -73,6 +73,8 @@ Cada modelo añade una fila. No hay que tocar código.
   fallar la mitad de los bordes.
 - **% fiel**: el número global, útil solo si se lee con las dos columnas
   anteriores al lado.
+- **tiempo**: lo que tarda la fila entera. Sirve para decidir si esto cabe en un
+  `pre-commit`; hoy cabe: las tres filas juntas, menos de cuatro segundos.
 
 ## La clave no se guarda
 
