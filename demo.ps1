@@ -95,8 +95,14 @@ try {
 
     # ---------------------------------------------------------------
     Paso "7. El informe: los mismos numeros, en una pantalla"
-    Comando "python -m fiel --spec fiel.estudio.toml report --out informe.html --open"
-    Fiel --spec fiel.estudio.toml report --out informe.html --open
+    if ($NoPause) {
+        Comando "python -m fiel --spec fiel.estudio.toml report --out informe.html"
+        Fiel --spec fiel.estudio.toml report --out informe.html
+    }
+    else {
+        Comando "python -m fiel --spec fiel.estudio.toml report --out informe.html --open"
+        Fiel --spec fiel.estudio.toml report --out informe.html --open
+    }
     Write-Host ""
     Write-Host "  312 casos, 66 divergencias, cada una con su entrada exacta." -ForegroundColor Green
     Pausa
