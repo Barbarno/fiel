@@ -144,10 +144,11 @@ fiel/
 ├── shrink.py      reduce un caso que diverge al minimo (ddmin)
 ├── guard.py       instala la comprobacion como hook de git
 ├── badge.py       chapa SVG con el resultado, para el README
+├── ci.py          escribe el workflow de GitHub Actions del proyecto
 └── cli.py          los comandos
 ```
 
-4.015 líneas no vacías de motor, 108 pruebas automáticas, cero dependencias externas.
+4.191 líneas no vacías de motor, 114 pruebas automáticas, cero dependencias externas.
 
 ### 6.2 Los comandos
 
@@ -168,6 +169,7 @@ fiel/
 | `fiel shrink` | reduce un caso que diverge al mínimo que sigue fallando |
 | `fiel guard` | instala `fiel check` como hook de git: el commit no se crea si hay divergencia |
 | `fiel badge` | escribe una chapa SVG con el resultado, para el README |
+| `fiel ci` | escribe el workflow de GitHub Actions con la comprobacion dentro |
 
 ### 6.3 El corpus
 
@@ -202,7 +204,7 @@ formato y la herramienta sería inservible.
 
 ### 7.1 Pruebas automáticas
 
-108 pruebas unitarias sobre el motor: comparación, normalización, corpus,
+114 pruebas unitarias sobre el motor: comparación, normalización, corpus,
 baseline, importación, informe y CLI. Se ejecutan en menos de un segundo.
 
 ### 7.2 Integración continua

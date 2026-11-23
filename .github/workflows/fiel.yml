@@ -204,6 +204,14 @@ jobs:
           print("junit correcto")
           PY
 
+      - name: El workflow que genera fiel lleva la especificacion dentro
+        run: |
+          fiel --root examples/demo ci --install --pair cron-fiel --out "$RUNNER_TEMP/wf.yml"
+          grep -q "fiel.toml" "$RUNNER_TEMP/wf.yml"
+          grep -q -- "--pair cron-fiel" "$RUNNER_TEMP/wf.yml"
+          grep -q -- "--format github" "$RUNNER_TEMP/wf.yml"
+          grep -q "actions/checkout" "$RUNNER_TEMP/wf.yml"
+
   puerta:
     name: el hook de git bloquea un commit roto
     runs-on: ubuntu-latest

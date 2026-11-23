@@ -162,6 +162,7 @@ idempotente listo para publicar.
 | `fiel shrink` | reduce un caso que diverge al mínimo que sigue divergiendo |
 | `fiel guard` | instala `fiel check` como hook de git: no se commitea una divergencia nueva |
 | `fiel badge` | escribe una chapa SVG con el resultado, para el README |
+| `fiel ci` | escribe el workflow de GitHub Actions con la comprobación dentro |
 
 Opciones útiles de `check`: `--pair`, `--case`, `--jobs`, `--strict` (ignora el
 baseline), `--no-baseline`, `--format console|markdown|github|json|junit`.
@@ -266,6 +267,24 @@ JavaScript y sin servicios, que se commitea y GitHub pinta en el README. Verde
 si todo el corpus sigue siendo fiel, ámbar por encima del 90 %, rojo si el port
 se ha desviado de verdad. El texto va siempre dentro, para que se lea también
 en blanco y negro y con lector de pantalla.
+
+**«¿Y en el repositorio, sin depender de que alguien se acuerde?»** — `fiel ci`.
+Escribe el workflow con la especificación del proyecto ya dentro:
+
+```bash
+$ fiel ci --install
+  fichero  .github/workflows/fiel.yml
+  estado   instalado
+  parejas  cron-fiel, cron-roto
+
+desde ahora, cada push a main y cada pull request ejecuta la comprobacion.
+```
+
+No es una plantilla copiada: lleva el nombre real de la especificación, las
+parejas que existen en ella y `--format github`, así que cada divergencia sale
+como anotación sobre la línea del pull request. Con `--out` se pone en otro
+sitio, con `--pair` se limita a una pareja y con `--remove` se va. Si ya hay un
+workflow y no lo escribió fiel, no lo pisa salvo con `--force`.
 
 ## Lo que el corpus no cubre
 

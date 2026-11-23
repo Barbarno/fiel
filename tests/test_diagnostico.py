@@ -16,6 +16,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fiel import check as check_mod
+from fiel import ci as ci_mod
 from fiel import badge as badge_mod
 from fiel import cli
 from fiel import corpus as corpus_mod
@@ -370,13 +371,68 @@ class JunitTests(unittest.TestCase):
         self.assertEqual(codigo, cli.EXIT_OK)
 
 
+class CiTests(unittest.TestCase):
+    def test_el_guion_lleva_la_especificacion_y_las_parejas(self) -> None:
+        proyecto = load(DEMO)
+        texto = ci_mod.guion(proyecto, ("cron-fiel",))
+        self.assertIn("fiel.toml", texto)
+        self.assertIn("--pair cron-fiel", texto)
+        self.assertIn("--format github", texto)
+        self.assertIn(ci_mod.MARCA, texto)
+
+    def test_con_todas_las_parejas_no_se_listan(self) -> None:
+        proyecto = load(DEMO)
+        todas = tuple(p.id for p in proyecto.pairs)
+        texto = ci_mod.guion(proyecto, todas)
+        self.assertNotIn("--pair", texto)
+
+    def test_una_pareja_que_no_existe_se_rechaza(self) -> None:
+        proyecto = load(DEMO)
+        with self.assertRaises(ci_mod.CiError):
+            ci_mod.guion(proyecto, ("no-existe",))
+
+    def test_escribe_y_quita_el_workflow(self) -> None:
+        proyecto = load(DEMO)
+        with tempfile.TemporaryDirectory() as tmp:
+            destino = Path(tmp) / ".github" / "workflows" / "fiel.yml"
+            escrito = ci_mod.escribir(proyecto, destino=destino)
+            self.assertTrue(escrito.existe)
+            self.assertTrue(destino.is_file())
+
+            quitado = ci_mod.quitar(DEMO, destino)
+            self.assertFalse(quitado.existe)
+            self.assertFalse((Path(tmp) / ".github").exists())
+
+    def test_no_pisa_un_workflow_ajeno(self) -> None:
+        proyecto = load(DEMO)
+        with tempfile.TemporaryDirectory() as tmp:
+            destino = Path(tmp) / ".github" / "workflows" / "fiel.yml"
+            destino.parent.mkdir(parents=True)
+            destino.write_text("name: otro\n", encoding="utf-8")
+
+            with self.assertRaises(ci_mod.CiError):
+                ci_mod.escribir(proyecto, destino=destino)
+            self.assertEqual(destino.read_text(encoding="utf-8"), "name: otro\n")
+
+    def test_el_comando_escribe_y_quita(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            destino = Path(tmp) / "wf" / "fiel.yml"
+            codigo = cli.main(["--root", str(DEMO), "ci", "--install", "--out", str(destino)])
+            self.assertEqual(codigo, cli.EXIT_OK)
+            self.assertIn("actions/checkout", destino.read_text(encoding="utf-8"))
+
+            codigo = cli.main(["--root", str(DEMO), "ci", "--remove", "--out", str(destino)])
+            self.assertEqual(codigo, cli.EXIT_OK)
+            self.assertFalse(destino.exists())
+
+
 class CliTests(unittest.TestCase):
     def test_los_comandos_nuevos_estan_en_el_ayuda(self) -> None:
         parser = cli.build_parser()
         acciones = [a for a in parser._actions if getattr(a, "choices", None)]
         comandos = set(acciones[0].choices) if acciones else set()
 
-        for nombre in ("coverage", "probe", "shrink", "doctor", "watch", "guard"):
+        for nombre in ("coverage", "probe", "shrink", "doctor", "watch", "guard", "badge", "ci"):
             self.assertIn(nombre, comandos)
 
     def test_probe_por_linea_de_comandos(self) -> None:

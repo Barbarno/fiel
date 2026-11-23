@@ -12,6 +12,7 @@ from . import adapters
 from . import adequacy as adequacy_mod
 from . import badge as badge_mod
 from . import check as check_mod
+from . import ci as ci_mod
 from . import corpus as corpus_mod
 from . import coverage as coverage_mod
 from . import gate as gate_mod
@@ -133,6 +134,36 @@ def cmd_badge(args: argparse.Namespace) -> int:
     print(f"chapa escrita en {destino.resolve()}")
     print(f"  {chapa.etiqueta} {chapa.valor}  ({chapa.fieles} de {chapa.total} casos)")
     return EXIT_OK if chapa.fieles == chapa.total else EXIT_DIVERGENCE
+
+
+def cmd_ci(args: argparse.Namespace) -> int:
+    root = _root(args)
+    destino = Path(args.out)
+    try:
+        if args.remove:
+            resultado = ci_mod.quitar(root, destino)
+            verbo = "quitado" if not resultado.existe else "no estaba"
+            print(f"fiel ci: {verbo} en {resultado.ruta}")
+            return EXIT_OK
+        if not args.install:
+            print(ci_mod.console(ci_mod.estado(root, destino), root))
+            return EXIT_OK
+        project = load(root, args.spec)
+        resultado = ci_mod.escribir(
+            project,
+            destino=destino,
+            parejas=tuple(args.pair or ()),
+            spec=args.spec or "fiel.toml",
+            force=args.force,
+            install=args.pip,
+        )
+        print(ci_mod.console(resultado, project.root))
+        print("")
+        print("desde ahora, cada push a main y cada pull request ejecuta la comprobacion.")
+        return EXIT_OK
+    except (SpecError, ci_mod.CiError) as exc:
+        print(f"fiel ci: {exc}", file=sys.stderr)
+        return EXIT_ERROR
 
 
 def _as_json(result, known, fresh, strict: bool) -> dict:
@@ -522,6 +553,24 @@ def build_parser() -> argparse.ArgumentParser:
     add_common(p_badge)
     p_badge.add_argument("--out", default="fiel.svg", help="fichero SVG de salida")
     p_badge.set_defaults(func=cmd_badge)
+
+    p_ci = sub.add_parser("ci", help="escribe el workflow de GitHub Actions de la comprobacion")
+    p_ci.add_argument("--install", action="store_true", help="escribe el workflow")
+    p_ci.add_argument("--remove", action="store_true", help="quita el workflow que escribio fiel")
+    p_ci.add_argument("--out", default=str(ci_mod.RUTA_POR_DEFECTO), help="ruta del workflow")
+    p_ci.add_argument(
+        "--pair",
+        action="append",
+        metavar="ID",
+        help="vigila solo esta pareja (repetible); por defecto, todas",
+    )
+    p_ci.add_argument("--force", action="store_true", help="sustituye un workflow que no escribio fiel")
+    p_ci.add_argument(
+        "--pip",
+        default='pip install "fiel @ git+https://github.com/Barbarno/fiel"',
+        help="orden con la que el workflow instala fiel",
+    )
+    p_ci.set_defaults(func=cmd_ci)
 
     p_base = sub.add_parser("baseline", help="acepta las divergencias actuales")
     add_common(p_base)
