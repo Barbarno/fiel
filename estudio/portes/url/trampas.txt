@@ -1,0 +1,11 @@
+https://example.com:8443/a?b=c#d
+http://user:pass@host:8080/p?q#f
+http://host
+//host/path
+?q=1
+#frag
+HTTP://Host/Path
+mailto:a@b.com
+http://host/a#b#c
+example.com
+http://

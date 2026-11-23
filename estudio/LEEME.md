@@ -1,7 +1,30 @@
-# Cómo llenar las otras dos filas de la tabla
+# Cómo añadir filas a la tabla
 
-La tabla funciona con una fila porque los tres ports de Rust ya existen. Para
-añadir modelos solo hace falta una clave gratuita. Dos minutos.
+La tabla ya trae tres filas hechas, todas medibles sin clave ni conexión:
+
+| fila | qué es |
+|---|---|
+| port de IA (Rust, una pasada) | los tres ports de `examples/targets`, escritos por un asistente |
+| bibliotecas reales | `semver` de Python contra `semver` de Rust |
+| reescritura a mano (stdlib) | seis funciones de la biblioteca estándar reescritas a mano |
+
+Las dos primeras se miden solas: los binarios de Rust tienen que estar
+compilados (`cargo build --release --target x86_64-pc-windows-gnu`). La tercera
+no necesita compilar nada.
+
+Para añadir filas de modelos hace falta una clave gratuita. Dos minutos.
+
+## 0. Rehacer la fila de las reescrituras
+
+Solo si se tocan los corpus:
+
+```powershell
+python estudio/portes/casos.py       # reescribe normal.txt y trampas.txt
+python estudio/portes/probe.py       # dice qué entradas divergen
+```
+
+Y se vuelven a grabar con `fiel add --root estudio/portes add --pair mano-csv ...`.
+El detalle está en `estudio/portes/LEEME.md`.
 
 ## 1. Saca la clave
 

@@ -25,10 +25,10 @@ y comprueba, en cada cambio, que la versión nueva hace exactamente lo mismo.
 No opina: ejecuta las mismas entradas contra los dos programas y compara las
 salidas.
 
-El proyecto incluye la herramienta, cuatro funciones convertidas en casos de
-uso reales, un ejemplo con dos bibliotecas reales, 220 casos grabados, un
-estudio con ports escritos por IA y un _check_ de GitHub que bloquea un pull
-request cuando la equivalencia se rompe.
+El proyecto incluye la herramienta, seis ejemplos reales (cuatro funciones, dos
+bibliotecas del mismo estándar y seis reescrituras a mano de la biblioteca
+estándar), 302 casos grabados, un estudio con ports escritos por IA y un _check_
+de GitHub que bloquea un pull request cuando la equivalencia se rompe.
 
 ---
 
@@ -99,7 +99,7 @@ compara y devuelve un código de salida.
 | No bloquear la adopción en proyectos que ya venían mal | el _baseline_ permite aceptar fallos existentes y fallar solo con los nuevos |
 | Encajar en el trabajo diario | un comando, código de salida 0/1, integración con GitHub Actions |
 | No depender de nada externo | solo Python 3.11 y biblioteca estándar |
-| Producir datos, no solo una herramienta | tabla de resultados con cuatro targets y 167 casos |
+| Producir datos, no solo una herramienta | tabla de resultados con cinco ejemplos y 302 casos |
 
 ---
 
@@ -257,6 +257,46 @@ Es el hallazgo más fuerte del proyecto: no es un fallo inventado en un ejemplo,
 es una diferencia real entre dos implementaciones del mismo estándar, y la
 herramienta la encuentra sola.
 
+### 7.6 Seis reescrituras a mano
+
+Quedaba un caso por cubrir, y es el más común de todos: alguien que no migra de
+lenguaje ni pide un port, sino que reescribe una función de la biblioteca
+estándar porque le parece sencilla.
+
+`estudio/portes/` tiene seis parejas de ese tipo: `csv`, `shlex`, `url`, `wrap`,
+`ip` y `casefold`. En cada una, el original es la función real de Python y el
+port es la reescritura ingenua que haría cualquiera en cinco minutos.
+
+Las seis pasan su corpus normal entero. Con las trampas:
+
+```
+mano-csv:          6/6 fieles  [OK]     mano-csv-trampas:          2/8  [6 divergencias]
+mano-shlex:        6/6 fieles  [OK]     mano-shlex-trampas:        1/8  [7 divergencias]
+mano-url:          6/6 fieles  [OK]     mano-url-trampas:          0/11 [11 divergencias]
+mano-wrap:         6/6 fieles  [OK]     mano-wrap-trampas:         0/6  [6 divergencias]
+mano-ip:           6/6 fieles  [OK]     mano-ip-trampas:           0/5  [5 divergencias]
+mano-casefold:     6/6 fieles  [OK]     mano-casefold-trampas:     3/8  [5 divergencias]
+```
+
+**36 de 36 casos corrientes, 40 de 46 trampas divergen.** No es que las seis
+reescrituras estén mal escritas: es que cada una tomó una decisión razonable
+que la función real no toma.
+
+- `line.split(",")` no entiende comillas: `"a,b",c` sale partido en tres.
+- `line.split()` no entiende `"a b" c`, ni `a\ b c`, ni `a#b`.
+- `split("://")` pierde el fragmento, el usuario, el esquema en mayúsculas y las
+  URLs que empiezan por `//`.
+- `textwrap.wrap` parte palabras largas y por guiones; la reescritura no.
+- Un `split(".")` de cuatro partes no ve IPv6 y acepta `1.2.3.04`, que
+  `ipaddress` rechaza.
+- `lower()` no es `casefold()`: `Straße` da `strasse` en una y `straße` en otra.
+
+Este banco cierra el argumento del proyecto. No hace falta un modelo, ni un
+cambio de lenguaje, ni un proyecto grande: **una función de veinte líneas
+reescrita a mano ya no es equivalente, y nadie lo nota hasta que se prueba a
+propósito.** El corpus se reconstruye con `python estudio/portes/casos.py` y las
+divergencias se listan con `python estudio/portes/probe.py`.
+
 ---
 
 ## 8. Resultados
@@ -276,10 +316,22 @@ herramienta la encuentra sola.
 | semver-real | 40 | 40 | 0 |
 | semver-real-trampas | 8 | 3 | 5 |
 | semver-real-fijo | 5 | 5 | 0 |
-| **total** | **230** | **205** | **25** |
+| mano-csv | 6 | 6 | 0 |
+| mano-csv-trampas | 8 | 2 | 6 |
+| mano-shlex | 6 | 6 | 0 |
+| mano-shlex-trampas | 8 | 1 | 7 |
+| mano-url | 6 | 6 | 0 |
+| mano-url-trampas | 11 | 0 | 11 |
+| mano-wrap | 6 | 6 | 0 |
+| mano-wrap-trampas | 6 | 0 | 6 |
+| mano-ip | 6 | 6 | 0 |
+| mano-ip-trampas | 5 | 0 | 5 |
+| mano-casefold | 6 | 6 | 0 |
+| mano-casefold-trampas | 8 | 3 | 5 |
+| **total** | **312** | **247** | **65** |
 
-Casos únicos grabados: **220**. Comprobaciones por vuelta: **230** (el corpus
-del ejemplo del rango lo usan dos parejas). Divergencias encontradas: **25**.
+Casos únicos grabados: **302**. Comprobaciones por vuelta: **312** (el corpus
+del ejemplo del rango lo usan dos parejas). Divergencias encontradas: **65**.
 
 Las divergencias no son de sintaxis. Son de comportamiento:
 
@@ -292,6 +344,9 @@ Las divergencias no son de sintaxis. Son de comportamiento:
 - Dos bibliotecas del mismo estándar ordenan distinto dos versiones que solo
   cambian en la metadata de build: una la ignora (como dice el estándar) y la
   otra no.
+- Una reescritura "a mano" de `csv`, `shlex`, `url`, `wrap`, `ip` o `casefold`
+  pasa los seis casos corrientes y falla 40 de las 46 trampas: comillas, escapes,
+  fragmentos, IPv6, palabras largas, `ß`.
 
 ---
 
@@ -321,8 +376,8 @@ es más creíble que uno que los esconde.
 
 1. La equivalencia no se demuestra una vez. Se mantiene.
 2. Un port que pasa los tests puede no ser equivalente: los cuatro targets lo
-   demuestran con 20 divergencias reales, y dos bibliotecas del mismo estándar
-   añaden otras 5.
+   demuestran con 20 divergencias reales, dos bibliotecas del mismo estándar
+   añaden otras 5 y seis reescrituras a mano añaden 40 más.
 3. La herramienta es pequeña a propósito. Su valor no está en las líneas, sino
    en que produce una respuesta binaria y verificable en cada cambio.
 4. El límite principal no es técnico, es de cobertura: el corpus es el activo.

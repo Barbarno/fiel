@@ -180,6 +180,64 @@ def _fila_real() -> dict[str, object] | None:
     }
 
 
+def _fila_portes() -> dict[str, object] | None:
+    """Seis funciones de la biblioteca estandar reescritas a mano.
+
+    No son ports de un modelo ni de Rust: son el caso mas comun de todos, el
+    de alguien que reescribe `csv`, `shlex` o `ipaddress` "a mano" porque le
+    parece sencillo. Cada una pasa su corpus normal y falla en las trampas.
+    """
+    base = ROOT / "estudio" / "portes"
+    parejas = ("csv", "shlex", "url", "wrap", "ip", "casefold")
+    if not all((base / p / "corpus" / f"{p}.jsonl").is_file() for p in parejas):
+        return None
+    detalle: dict[str, tuple[int, int, int, int]] = {}
+    for nombre in parejas:
+        original = Endpoint(command=("python", "original.py"), cwd=str(base / nombre))
+        port = Endpoint(command=("python", "port.py"), cwd=str(base / nombre))
+        normal = check_mod.check(
+            Project(
+                root=ROOT,
+                pairs=(
+                    Pair(
+                        id=nombre,
+                        original=original,
+                        port=port,
+                        corpus=f"estudio/portes/{nombre}/corpus/{nombre}.jsonl",
+                        normalize="text",
+                        errors="ignore",
+                        timeout_ms=10000,
+                    ),
+                ),
+            ),
+            jobs=4,
+        )
+        trampas = check_mod.check(
+            Project(
+                root=ROOT,
+                pairs=(
+                    Pair(
+                        id=f"{nombre}-trampas",
+                        original=original,
+                        port=port,
+                        corpus=f"estudio/portes/{nombre}/corpus/{nombre}-trampas.jsonl",
+                        normalize="text",
+                        errors="ignore",
+                        timeout_ms=10000,
+                    ),
+                ),
+            ),
+            jobs=4,
+        )
+        detalle[nombre] = (
+            normal.total,
+            normal.total - normal.failed,
+            trampas.total,
+            trampas.failed,
+        )
+    return _resumen("reescritura a mano (stdlib, sin dependencias)", detalle)
+
+
 def cmd_medir(args: argparse.Namespace) -> int:
     filas: list[dict[str, object]] = []
 
@@ -195,6 +253,10 @@ def cmd_medir(args: argparse.Namespace) -> int:
     real = _fila_real()
     if real:
         filas.append(real)
+
+    portes = _fila_portes()
+    if portes:
+        filas.append(portes)
 
     base = ESTUDIO / "salidas"
     if base.is_dir():

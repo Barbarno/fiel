@@ -1,0 +1,6 @@
+http://example.com/path
+https://example.com/a/b
+http://host/a
+https://host/
+http://host/a?b=c
+https://host:8443/a

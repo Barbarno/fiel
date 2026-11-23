@@ -98,7 +98,7 @@ try {
     Comando "python -m fiel --spec fiel.estudio.toml report --out informe.html --open"
     Fiel --spec fiel.estudio.toml report --out informe.html --open
     Write-Host ""
-    Write-Host "  230 casos, 25 divergencias, cada una con su entrada exacta." -ForegroundColor Green
+    Write-Host "  312 casos, 65 divergencias, cada una con su entrada exacta." -ForegroundColor Green
     Pausa
 
     # ---------------------------------------------------------------
@@ -115,7 +115,16 @@ try {
     Pausa
 
     # ---------------------------------------------------------------
-    Paso "9. El registro: un pull request real con el check en rojo"
+    Paso "9. Seis funciones de la stdlib reescritas a mano"
+    Comando "python -m fiel --root estudio/portes check --pair mano-csv --pair mano-csv-trampas"
+    Fiel --root estudio/portes check --pair mano-csv --pair mano-csv-trampas
+    Write-Host ""
+    Write-Host "  6 de 6 en lo corriente; las comillas no las entiende." -ForegroundColor DarkYellow
+    Write-Host "  Las seis parejas: 36/36 normal, 40 de 46 trampas divergen." -ForegroundColor DarkYellow
+    Pausa
+
+    # ---------------------------------------------------------------
+    Paso "10. El registro: un pull request real con el check en rojo"
     $url = "https://github.com/Barbarno/fiel/pull/1"
     Write-Host ""
     Write-Host "  $url" -ForegroundColor Blue

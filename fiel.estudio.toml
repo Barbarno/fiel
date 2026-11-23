@@ -139,3 +139,114 @@ corpus = "examples/real-semver/corpus/orden.jsonl"
 timeout_ms = 10000
 normalize = "text"
 errors = "ignore"
+
+
+# --- seis funciones de la stdlib reescritas a mano ---------------------------
+
+[[pair]]
+id = "mano-csv"
+original = { command = ["python", "original.py"], cwd = "estudio/portes/csv" }
+port = { command = ["python", "port.py"], cwd = "estudio/portes/csv" }
+corpus = "estudio/portes/csv/corpus/csv.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "mano-csv-trampas"
+original = { command = ["python", "original.py"], cwd = "estudio/portes/csv" }
+port = { command = ["python", "port.py"], cwd = "estudio/portes/csv" }
+corpus = "estudio/portes/csv/corpus/csv-trampas.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "mano-shlex"
+original = { command = ["python", "original.py"], cwd = "estudio/portes/shlex" }
+port = { command = ["python", "port.py"], cwd = "estudio/portes/shlex" }
+corpus = "estudio/portes/shlex/corpus/shlex.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "mano-shlex-trampas"
+original = { command = ["python", "original.py"], cwd = "estudio/portes/shlex" }
+port = { command = ["python", "port.py"], cwd = "estudio/portes/shlex" }
+corpus = "estudio/portes/shlex/corpus/shlex-trampas.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "mano-url"
+original = { command = ["python", "original.py"], cwd = "estudio/portes/url" }
+port = { command = ["python", "port.py"], cwd = "estudio/portes/url" }
+corpus = "estudio/portes/url/corpus/url.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "mano-url-trampas"
+original = { command = ["python", "original.py"], cwd = "estudio/portes/url" }
+port = { command = ["python", "port.py"], cwd = "estudio/portes/url" }
+corpus = "estudio/portes/url/corpus/url-trampas.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "mano-wrap"
+original = { command = ["python", "original.py"], cwd = "estudio/portes/wrap" }
+port = { command = ["python", "port.py"], cwd = "estudio/portes/wrap" }
+corpus = "estudio/portes/wrap/corpus/wrap.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "mano-wrap-trampas"
+original = { command = ["python", "original.py"], cwd = "estudio/portes/wrap" }
+port = { command = ["python", "port.py"], cwd = "estudio/portes/wrap" }
+corpus = "estudio/portes/wrap/corpus/wrap-trampas.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "mano-ip"
+original = { command = ["python", "original.py"], cwd = "estudio/portes/ip" }
+port = { command = ["python", "port.py"], cwd = "estudio/portes/ip" }
+corpus = "estudio/portes/ip/corpus/ip.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "mano-ip-trampas"
+original = { command = ["python", "original.py"], cwd = "estudio/portes/ip" }
+port = { command = ["python", "port.py"], cwd = "estudio/portes/ip" }
+corpus = "estudio/portes/ip/corpus/ip-trampas.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "mano-casefold"
+original = { command = ["python", "original.py"], cwd = "estudio/portes/casefold" }
+port = { command = ["python", "port.py"], cwd = "estudio/portes/casefold" }
+corpus = "estudio/portes/casefold/corpus/casefold.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"
+
+[[pair]]
+id = "mano-casefold-trampas"
+original = { command = ["python", "original.py"], cwd = "estudio/portes/casefold" }
+port = { command = ["python", "port.py"], cwd = "estudio/portes/casefold" }
+corpus = "estudio/portes/casefold/corpus/casefold-trampas.jsonl"
+timeout_ms = 10000
+normalize = "text"
+errors = "ignore"

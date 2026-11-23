@@ -2,7 +2,7 @@
 baseline = "fiel.baseline.json"
 
 [[pair]]
-id = "csv"
+id = "mano-csv"
 original = { command = ["python", "original.py"], cwd = "csv" }
 port = { command = ["python", "port.py"], cwd = "csv" }
 corpus = "csv/corpus/csv.jsonl"
@@ -10,7 +10,7 @@ timeout_ms = 5000
 normalize = "text"
 
 [[pair]]
-id = "shlex"
+id = "mano-shlex"
 original = { command = ["python", "original.py"], cwd = "shlex" }
 port = { command = ["python", "port.py"], cwd = "shlex" }
 corpus = "shlex/corpus/shlex.jsonl"
@@ -18,7 +18,7 @@ timeout_ms = 5000
 normalize = "text"
 
 [[pair]]
-id = "url"
+id = "mano-url"
 original = { command = ["python", "original.py"], cwd = "url" }
 port = { command = ["python", "port.py"], cwd = "url" }
 corpus = "url/corpus/url.jsonl"
@@ -26,7 +26,7 @@ timeout_ms = 5000
 normalize = "text"
 
 [[pair]]
-id = "wrap"
+id = "mano-wrap"
 original = { command = ["python", "original.py"], cwd = "wrap" }
 port = { command = ["python", "port.py"], cwd = "wrap" }
 corpus = "wrap/corpus/wrap.jsonl"
@@ -34,7 +34,7 @@ timeout_ms = 5000
 normalize = "text"
 
 [[pair]]
-id = "ip"
+id = "mano-ip"
 original = { command = ["python", "original.py"], cwd = "ip" }
 port = { command = ["python", "port.py"], cwd = "ip" }
 corpus = "ip/corpus/ip.jsonl"
@@ -42,9 +42,57 @@ timeout_ms = 5000
 normalize = "text"
 
 [[pair]]
-id = "casefold"
+id = "mano-casefold"
 original = { command = ["python", "original.py"], cwd = "casefold" }
 port = { command = ["python", "port.py"], cwd = "casefold" }
 corpus = "casefold/corpus/casefold.jsonl"
+timeout_ms = 5000
+normalize = "text"
+
+[[pair]]
+id = "mano-csv-trampas"
+original = { command = ["python", "original.py"], cwd = "csv" }
+port = { command = ["python", "port.py"], cwd = "csv" }
+corpus = "csv/corpus/csv-trampas.jsonl"
+timeout_ms = 5000
+normalize = "text"
+
+[[pair]]
+id = "mano-shlex-trampas"
+original = { command = ["python", "original.py"], cwd = "shlex" }
+port = { command = ["python", "port.py"], cwd = "shlex" }
+corpus = "shlex/corpus/shlex-trampas.jsonl"
+timeout_ms = 5000
+normalize = "text"
+
+[[pair]]
+id = "mano-url-trampas"
+original = { command = ["python", "original.py"], cwd = "url" }
+port = { command = ["python", "port.py"], cwd = "url" }
+corpus = "url/corpus/url-trampas.jsonl"
+timeout_ms = 5000
+normalize = "text"
+
+[[pair]]
+id = "mano-wrap-trampas"
+original = { command = ["python", "original.py"], cwd = "wrap" }
+port = { command = ["python", "port.py"], cwd = "wrap" }
+corpus = "wrap/corpus/wrap-trampas.jsonl"
+timeout_ms = 5000
+normalize = "text"
+
+[[pair]]
+id = "mano-ip-trampas"
+original = { command = ["python", "original.py"], cwd = "ip" }
+port = { command = ["python", "port.py"], cwd = "ip" }
+corpus = "ip/corpus/ip-trampas.jsonl"
+timeout_ms = 5000
+normalize = "text"
+
+[[pair]]
+id = "mano-casefold-trampas"
+original = { command = ["python", "original.py"], cwd = "casefold" }
+port = { command = ["python", "port.py"], cwd = "casefold" }
+corpus = "casefold/corpus/casefold-trampas.jsonl"
 timeout_ms = 5000
 normalize = "text"

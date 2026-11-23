@@ -1,0 +1,6 @@
+a b c
+uno dos tres
+ls -la /tmp
+a b c d e
+hola mundo
+x y

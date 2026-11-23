@@ -164,10 +164,9 @@ fiel --spec fiel.estudio.toml report --out informe.html --open
 Se abre el navegador con el informe. Señala las cuatro tarjetas de arriba y una
 divergencia cualquiera.
 
-> "Todo lo que han visto en la consola, aquí. Cuatro funciones, un ejemplo con
-> bibliotecas reales, 230 comprobaciones y 25 divergencias, cada una con la
-> entrada exacta que la provocó: `5-9`, `1_0`, `Café`, un número de veinte
-> cifras.
+> "Todo lo que han visto en la consola, aquí. Seis ejemplos, 312 comprobaciones
+> y 65 divergencias, cada una con la entrada exacta que la provocó: `5-9`,
+> `1_0`, `Café`, un número de veinte cifras, `"a,b",c`.
 > Sin javascript y sin conexión: el fichero se adjunta a la memoria y se abre
 > en cualquier ordenador."
 
@@ -207,7 +206,28 @@ fiel --root examples/real-semver check --pair semver-real-fijo
 
 ---
 
-## Acto 9 — El registro (30 segundos)
+## Acto 9 — Seis reescrituras a mano (35 segundos)
+
+```powershell
+fiel --root estudio/portes check --pair mano-csv --pair mano-csv-trampas
+```
+
+```
+mano-csv:          6/6 fieles  [OK]
+mano-csv-trampas:  2/8 fieles  [6 divergencias]
+```
+
+> "Y el caso más común de todos: no un modelo, no un cambio de lenguaje. Alguien
+> reescribe `csv` a mano porque parece fácil. Seis casos corrientes, seis
+> aciertos.
+> Las comillas no las entiende. `"a,b",c` lo parte en tres.
+> Hay seis parejas así: `csv`, `shlex`, `url`, `wrap`, `ip`, `casefold`. Las seis
+> pasan lo corriente y fallan 40 de las 46 trampas.
+> Una función de veinte líneas reescrita a mano ya no es equivalente."
+
+---
+
+## Acto 10 — El registro (30 segundos)
 
 Cambia a la pestaña del navegador con el pull request.
 
@@ -263,7 +283,7 @@ Fin. No digas nada más. Deja que pregunten.
 > fidelidad no tiene por qué ser monótona y una búsqueda binaria puede mentir.
 
 **"¿Cuánto tarda?"**
-> Los 230 casos, tres segundos. La demo entera, menos de dos. En GitHub, el
+> Los 312 casos, tres segundos. La demo entera, menos de dos. En GitHub, el
 > trabajo completo tarda entre veinte y treinta segundos, y la mayoría es
 > instalar y compilar.
 

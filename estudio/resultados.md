@@ -10,6 +10,7 @@ función. Las demás filas aparecen al ejecutar `generar` con un modelo.
 |---|---|---|---|---|---|
 | port de IA (Rust, una pasada) | 120 | 120 | 24 | 15 | 89.6% |
 | bibliotecas reales (python-semver vs semver-rs) | 40 | 40 | 8 | 5 | 89.6% |
+| reescritura a mano (stdlib, sin dependencias) | 36 | 36 | 46 | 40 | 51.2% |
 
 Detalle por target:
 
@@ -19,3 +20,9 @@ Detalle por target:
 | port de IA (Rust, una pasada) | toml | 40 | 40 | 8 | 5 |
 | port de IA (Rust, una pasada) | slug | 40 | 40 | 7 | 5 |
 | bibliotecas reales (python-semver vs semver-rs) | semver | 40 | 40 | 8 | 5 |
+| reescritura a mano (stdlib, sin dependencias) | csv | 6 | 6 | 8 | 6 |
+| reescritura a mano (stdlib, sin dependencias) | shlex | 6 | 6 | 8 | 7 |
+| reescritura a mano (stdlib, sin dependencias) | url | 6 | 6 | 11 | 11 |
+| reescritura a mano (stdlib, sin dependencias) | wrap | 6 | 6 | 6 | 6 |
+| reescritura a mano (stdlib, sin dependencias) | ip | 6 | 6 | 5 | 5 |
+| reescritura a mano (stdlib, sin dependencias) | casefold | 6 | 6 | 8 | 5 |

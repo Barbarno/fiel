@@ -224,8 +224,8 @@ La especificación `fiel.demo.toml` junta cuatro parejas —el port bueno, el ro
 el de Rust y los tres casos trampa— para que el informe enseñe el sistema
 completo: 33 casos, 28 fieles y 5 divergencias con su entrada exacta.
 
-Y `fiel.estudio.toml` junta los cuatro targets y el ejemplo real:
-**230 comprobaciones, 25 divergencias**.
+Y `fiel.estudio.toml` junta los cinco ejemplos y las seis reescrituras a mano:
+**312 comprobaciones, 65 divergencias**.
 
 ## Los cuatro targets
 
@@ -271,6 +271,39 @@ semver-real-fijo:      5/5  fieles  [OK]   <- con cmp_precedence
 ```
 
 Detalle en [`examples/real-semver/README.md`](examples/real-semver/README.md).
+
+## Seis reescrituras a mano
+
+El caso más común no es un port de IA ni una migración de lenguaje: es alguien
+que reescribe `csv`, `shlex`, `url`, `wrap`, `ip` o `casefold` "a mano" porque
+le parecen funciones sencillas.
+
+`estudio/portes/` tiene las seis parejas: la función real de la biblioteca
+estándar contra su reescritura ingenua. Cada una pasa su corpus normal entero.
+
+```
+mano-csv:          6/6 fieles  [OK]     mano-csv-trampas:          2/8  [6 divergencias]
+mano-shlex:        6/6 fieles  [OK]     mano-shlex-trampas:        1/8  [7 divergencias]
+mano-url:          6/6 fieles  [OK]     mano-url-trampas:          0/11 [11 divergencias]
+mano-wrap:         6/6 fieles  [OK]     mano-wrap-trampas:         0/6  [6 divergencias]
+mano-ip:           6/6 fieles  [OK]     mano-ip-trampas:           0/5  [5 divergencias]
+mano-casefold:     6/6 fieles  [OK]     mano-casefold-trampas:     3/8  [5 divergencias]
+```
+
+**36 de 36 casos corrientes, 40 de 46 trampas divergen.** Ninguna de las seis
+reescrituras falla en lo que se le ocurre probar a quien la escribió:
+
+- `line.split(",")` no entiende `"a,b",c`, ni `""`, ni una comilla sin cerrar.
+- `line.split()` no entiende `"a b" c`, ni `a\ b c`, ni `a#b`.
+- Un `split("://")` pierde el fragmento, el usuario, el esquema en mayúsculas y
+  las URLs que empiezan por `//`.
+- `textwrap.wrap` parte palabras largas y por guiones; la reescritura no.
+- Un `split(".")` de cuatro partes no ve IPv6 y acepta `1.2.3.04`, que
+  `ipaddress` rechaza.
+- `lower()` no es `casefold()`: `Straße` da `strasse` en una y `straße` en otra.
+
+Los corpus se reconstruyen con `python estudio/portes/casos.py` y las
+divergencias se listan con `python estudio/portes/probe.py`.
 
 ## El estudio
 

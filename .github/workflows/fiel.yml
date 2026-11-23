@@ -92,3 +92,39 @@ jobs:
         run: |
           fiel --root examples/real-semver --spec fiel.linux.toml check \
             --format github --no-baseline --pair semver-real --pair semver-real-fijo
+
+  portes:
+    name: seis reescrituras a mano
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Instalar fiel
+        run: pip install .
+
+      - name: Los seis ports pasan el corpus normal
+        run: |
+          fiel --root estudio/portes check --format github --no-baseline \
+            --pair mano-csv --pair mano-shlex --pair mano-url \
+            --pair mano-wrap --pair mano-ip --pair mano-casefold
+
+      - name: Las trampas siguen divergiendo
+        run: |
+          set +e
+          salida=$(fiel --root estudio/portes check --no-baseline \
+            --pair mano-csv-trampas --pair mano-shlex-trampas --pair mano-url-trampas \
+            --pair mano-wrap-trampas --pair mano-ip-trampas --pair mano-casefold-trampas)
+          codigo=$?
+          echo "$salida"
+          if [ "$codigo" -eq 0 ]; then
+            echo "::error::las trampas ya no divergen; el hallazgo del banco se ha perdido"
+            exit 1
+          fi
+          if ! echo "$salida" | grep -q "Divergencias (40)"; then
+            echo "::error::se esperaban 40 divergencias en el corpus de trampas"
+            exit 1
+          fi
