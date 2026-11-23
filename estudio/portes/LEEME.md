@@ -31,10 +31,10 @@ mano-shlex:        6/6 fieles  [OK]     mano-shlex-trampas:        1/8  [7 diver
 mano-url:          6/6 fieles  [OK]     mano-url-trampas:          0/11 [11 divergencias]
 mano-wrap:         6/6 fieles  [OK]     mano-wrap-trampas:         0/6  [6 divergencias]
 mano-ip:           6/6 fieles  [OK]     mano-ip-trampas:           0/5  [5 divergencias]
-mano-casefold:     6/6 fieles  [OK]     mano-casefold-trampas:     3/8  [5 divergencias]
+mano-casefold:     6/6 fieles  [OK]     mano-casefold-trampas:     2/8  [6 divergencias]
 ```
 
-**36 de 36 casos corrientes, 40 de 46 trampas divergen.** Las seis pasan lo que
+**36 de 36 casos corrientes, 41 de 46 trampas divergen.** Las seis pasan lo que
 se le ocurre probar a quien las escribió.
 
 ## Reconstruirlo desde cero
@@ -72,3 +72,13 @@ fallo. Las parejas sin `-trampas` tienen que dar `[OK]`.
 El corpus es de 82 entradas. Cubre las decisiones que cada reescritura tomó sin
 darse cuenta, no todas las que podría tomar. Un corpus más grande encuentra más;
 la herramienta no puede demostrar lo que no ha probado.
+
+El número exacto de divergencias depende de la versión de Unicode que traiga el
+intérprete: `casefold` cambia cuando cambia la tabla. Con Python 3.13 salen 41;
+con una versión anterior puede salir 40. Por eso el trabajo de GitHub exige al
+menos 35 y no un número fijo: lo que protege es que las trampas sigan
+divergiendo, no el recuento exacto.
+
+Las dos versiones de cada pareja escriben su salida en UTF-8 de forma explícita.
+Sin eso, en Windows la consola cp1252 tumbaba el proceso en las entradas con
+`ß` o `İ` y el resultado dependía del idioma del sistema, no del código.

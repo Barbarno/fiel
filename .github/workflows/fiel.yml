@@ -124,7 +124,7 @@ jobs:
             echo "::error::las trampas ya no divergen; el hallazgo del banco se ha perdido"
             exit 1
           fi
-          if ! echo "$salida" | grep -q "Divergencias (40)"; then
-            echo "::error::se esperaban 40 divergencias en el corpus de trampas"
+          if ! echo "$salida" | grep -qE "Divergencias \((3[5-9]|[4-9][0-9])\)"; then
+            echo "::error::se esperaban al menos 35 divergencias en el corpus de trampas"
             exit 1
           fi

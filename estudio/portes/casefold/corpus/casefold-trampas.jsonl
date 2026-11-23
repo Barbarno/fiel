@@ -1,8 +1,8 @@
 {"id": "u0001", "input_b64": "U3RyYcOfZQ==", "output_b64": "c3RyYXNzZQ0K", "status": "ok"}
-{"id": "u0002", "input_b64": "xLBzdGFuYnVs", "output_b64": "", "status": "err"}
+{"id": "u0002", "input_b64": "xLBzdGFuYnVs", "output_b64": "acyHc3RhbmJ1bA0K", "status": "ok"}
 {"id": "u0003", "input_b64": "76yBY2hlcm8=", "output_b64": "ZmljaGVybw0K", "status": "ok"}
-{"id": "u0004", "input_b64": "zqPOn86mzp/Oow==", "output_b64": "", "status": "err"}
+{"id": "u0004", "input_b64": "zqPOn86mzp/Oow==", "output_b64": "z4POv8+Gzr/Pgw0K", "status": "ok"}
 {"id": "u0005", "input_b64": "4bqe", "output_b64": "c3MNCg==", "status": "ok"}
 {"id": "u0006", "input_b64": "76yA", "output_b64": "ZmYNCg==", "status": "ok"}
 {"id": "u0007", "input_b64": "76yD", "output_b64": "ZmZpDQo=", "status": "ok"}
-{"id": "u0008", "input_b64": "x4V1bmdsYQ==", "output_b64": "", "status": "err"}
+{"id": "u0008", "input_b64": "x4V1bmdsYQ==", "output_b64": "x4Z1bmdsYQ0K", "status": "ok"}

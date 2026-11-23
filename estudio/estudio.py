@@ -319,7 +319,9 @@ def _write(filas: list[dict[str, object]], args: argparse.Namespace) -> None:
         "Generado por `python estudio/estudio.py medir`. No se edita a mano.\n\n"
         "La primera fila son los ports de Rust del repositorio: los escribió un\n"
         "asistente de IA en una pasada, a partir de la especificación de cada\n"
-        "función. Las demás filas aparecen al ejecutar `generar` con un modelo.\n\n"
+        "función. La segunda compara dos bibliotecas reales del mismo estándar. La\n"
+        "tercera son seis funciones de la biblioteca estándar reescritas a mano.\n"
+        "Las filas de modelos aparecen al ejecutar `generar` con una clave.\n\n"
     )
     md.write_text(header + _markdown(filas) + "\n", encoding="utf-8")
 

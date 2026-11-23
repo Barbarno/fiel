@@ -225,7 +225,7 @@ el de Rust y los tres casos trampa— para que el informe enseñe el sistema
 completo: 33 casos, 28 fieles y 5 divergencias con su entrada exacta.
 
 Y `fiel.estudio.toml` junta los cinco ejemplos y las seis reescrituras a mano:
-**312 comprobaciones, 65 divergencias**.
+**312 comprobaciones, 66 divergencias**.
 
 ## Los cuatro targets
 
@@ -287,10 +287,10 @@ mano-shlex:        6/6 fieles  [OK]     mano-shlex-trampas:        1/8  [7 diver
 mano-url:          6/6 fieles  [OK]     mano-url-trampas:          0/11 [11 divergencias]
 mano-wrap:         6/6 fieles  [OK]     mano-wrap-trampas:         0/6  [6 divergencias]
 mano-ip:           6/6 fieles  [OK]     mano-ip-trampas:           0/5  [5 divergencias]
-mano-casefold:     6/6 fieles  [OK]     mano-casefold-trampas:     3/8  [5 divergencias]
+mano-casefold:     6/6 fieles  [OK]     mano-casefold-trampas:     2/8  [6 divergencias]
 ```
 
-**36 de 36 casos corrientes, 40 de 46 trampas divergen.** Ninguna de las seis
+**36 de 36 casos corrientes, 41 de 46 trampas divergen.** Ninguna de las seis
 reescrituras falla en lo que se le ocurre probar a quien la escribió:
 
 - `line.split(",")` no entiende `"a,b",c`, ni `""`, ni una comilla sin cerrar.
@@ -303,7 +303,8 @@ reescrituras falla en lo que se le ocurre probar a quien la escribió:
 - `lower()` no es `casefold()`: `Straße` da `strasse` en una y `straße` en otra.
 
 Los corpus se reconstruyen con `python estudio/portes/casos.py` y las
-divergencias se listan con `python estudio/portes/probe.py`.
+divergencias se listan con `python estudio/portes/probe.py`. El detalle está en
+[`estudio/portes/LEEME.md`](estudio/portes/LEEME.md).
 
 ## El estudio
 

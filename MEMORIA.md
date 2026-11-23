@@ -275,10 +275,10 @@ mano-shlex:        6/6 fieles  [OK]     mano-shlex-trampas:        1/8  [7 diver
 mano-url:          6/6 fieles  [OK]     mano-url-trampas:          0/11 [11 divergencias]
 mano-wrap:         6/6 fieles  [OK]     mano-wrap-trampas:         0/6  [6 divergencias]
 mano-ip:           6/6 fieles  [OK]     mano-ip-trampas:           0/5  [5 divergencias]
-mano-casefold:     6/6 fieles  [OK]     mano-casefold-trampas:     3/8  [5 divergencias]
+mano-casefold:     6/6 fieles  [OK]     mano-casefold-trampas:     2/8  [6 divergencias]
 ```
 
-**36 de 36 casos corrientes, 40 de 46 trampas divergen.** No es que las seis
+**36 de 36 casos corrientes, 41 de 46 trampas divergen.** No es que las seis
 reescrituras estén mal escritas: es que cada una tomó una decisión razonable
 que la función real no toma.
 
@@ -295,7 +295,8 @@ Este banco cierra el argumento del proyecto. No hace falta un modelo, ni un
 cambio de lenguaje, ni un proyecto grande: **una función de veinte líneas
 reescrita a mano ya no es equivalente, y nadie lo nota hasta que se prueba a
 propósito.** El corpus se reconstruye con `python estudio/portes/casos.py` y las
-divergencias se listan con `python estudio/portes/probe.py`.
+divergencias se listan con `python estudio/portes/probe.py`. El detalle de las
+seis parejas está en `estudio/portes/LEEME.md`.
 
 ---
 
@@ -327,11 +328,11 @@ divergencias se listan con `python estudio/portes/probe.py`.
 | mano-ip | 6 | 6 | 0 |
 | mano-ip-trampas | 5 | 0 | 5 |
 | mano-casefold | 6 | 6 | 0 |
-| mano-casefold-trampas | 8 | 3 | 5 |
-| **total** | **312** | **247** | **65** |
+| mano-casefold-trampas | 8 | 2 | 6 |
+| **total** | **312** | **246** | **66** |
 
 Casos únicos grabados: **302**. Comprobaciones por vuelta: **312** (el corpus
-del ejemplo del rango lo usan dos parejas). Divergencias encontradas: **65**.
+del ejemplo del rango lo usan dos parejas). Divergencias encontradas: **66**.
 
 Las divergencias no son de sintaxis. Son de comportamiento:
 
@@ -345,7 +346,7 @@ Las divergencias no son de sintaxis. Son de comportamiento:
   cambian en la metadata de build: una la ignora (como dice el estándar) y la
   otra no.
 - Una reescritura "a mano" de `csv`, `shlex`, `url`, `wrap`, `ip` o `casefold`
-  pasa los seis casos corrientes y falla 40 de las 46 trampas: comillas, escapes,
+  pasa los seis casos corrientes y falla 41 de las 46 trampas: comillas, escapes,
   fragmentos, IPv6, palabras largas, `ß`.
 
 ---
@@ -377,7 +378,7 @@ es más creíble que uno que los esconde.
 1. La equivalencia no se demuestra una vez. Se mantiene.
 2. Un port que pasa los tests puede no ser equivalente: los cuatro targets lo
    demuestran con 20 divergencias reales, dos bibliotecas del mismo estándar
-   añaden otras 5 y seis reescrituras a mano añaden 40 más.
+   añaden otras 5 y seis reescrituras a mano añaden 41 más.
 3. La herramienta es pequeña a propósito. Su valor no está en las líneas, sino
    en que produce una respuesta binaria y verificable en cada cambio.
 4. El límite principal no es técnico, es de cobertura: el corpus es el activo.

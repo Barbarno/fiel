@@ -165,7 +165,7 @@ Se abre el navegador con el informe. Señala las cuatro tarjetas de arriba y una
 divergencia cualquiera.
 
 > "Todo lo que han visto en la consola, aquí. Seis ejemplos, 312 comprobaciones
-> y 65 divergencias, cada una con la entrada exacta que la provocó: `5-9`,
+> y 66 divergencias, cada una con la entrada exacta que la provocó: `5-9`,
 > `1_0`, `Café`, un número de veinte cifras, `"a,b",c`.
 > Sin javascript y sin conexión: el fichero se adjunta a la memoria y se abre
 > en cualquier ordenador."
@@ -222,7 +222,7 @@ mano-csv-trampas:  2/8 fieles  [6 divergencias]
 > aciertos.
 > Las comillas no las entiende. `"a,b",c` lo parte en tres.
 > Hay seis parejas así: `csv`, `shlex`, `url`, `wrap`, `ip`, `casefold`. Las seis
-> pasan lo corriente y fallan 40 de las 46 trampas.
+> pasan lo corriente y fallan 41 de las 46 trampas.
 > Una función de veinte líneas reescrita a mano ya no es equivalente."
 
 ---

@@ -98,7 +98,7 @@ try {
     Comando "python -m fiel --spec fiel.estudio.toml report --out informe.html --open"
     Fiel --spec fiel.estudio.toml report --out informe.html --open
     Write-Host ""
-    Write-Host "  312 casos, 65 divergencias, cada una con su entrada exacta." -ForegroundColor Green
+    Write-Host "  312 casos, 66 divergencias, cada una con su entrada exacta." -ForegroundColor Green
     Pausa
 
     # ---------------------------------------------------------------
@@ -120,7 +120,7 @@ try {
     Fiel --root estudio/portes check --pair mano-csv --pair mano-csv-trampas
     Write-Host ""
     Write-Host "  6 de 6 en lo corriente; las comillas no las entiende." -ForegroundColor DarkYellow
-    Write-Host "  Las seis parejas: 36/36 normal, 40 de 46 trampas divergen." -ForegroundColor DarkYellow
+    Write-Host "  Las seis parejas: 36/36 normal, 41 de 46 trampas divergen." -ForegroundColor DarkYellow
     Pausa
 
     # ---------------------------------------------------------------
