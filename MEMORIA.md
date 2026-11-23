@@ -342,6 +342,40 @@ sentencias cada una: son funciones de una sola rama y el corpus las recorre
 entera. La diferencia entre 100 % ahí y 68,9 % en `url` no mide la calidad del
 corpus, mide el tamaño del programa original.
 
+### 7.8 Cómo entra en un proyecto que ya existe
+
+Una herramienta que exige cambiar de flujo no se usa. Estas dos piezas están
+para que la comprobación llegue sin que nadie tenga que acordarse de lanzarla.
+
+`fiel guard` escribe el hook `.git/hooks/pre-commit` con el mismo comando que se
+lanza a mano. No hay lógica nueva dentro del hook: llama a `fiel check` y
+devuelve su código de salida, así que si hay una divergencia el commit no se
+crea. Se probó en un repositorio de verdad, con el ejemplo del proyecto dentro:
+
+```
+commit limpio            -> 0
+se rompe una línea       -> 1, y el commit no aparece en el historial
+fiel guard --remove      -> 0 otra vez
+```
+
+`fiel ci` escribe el workflow de GitHub Actions. No es una plantilla copiada:
+lleva el nombre de la especificación del proyecto, las parejas que existen en
+ella y `--format github`, de modo que cada divergencia sale como anotación en la
+línea del pull request. Si el fichero ya existía y lo escribió otra herramienta,
+se niega a pisarlo salvo con `--force`.
+
+Las dos aceptan `--pair` por una razón concreta: un proyecto puede tener una
+pareja que diverge a propósito —el ejemplo de este repositorio la tiene, para
+enseñar el fallo— y la puerta debe vigilar las que tienen que seguir siendo
+fieles, no todas.
+
+Y para que el resultado se vea sin abrir la terminal, `fiel badge` escribe un
+SVG de una sola pieza, sin JavaScript y sin recursos remotos, que GitHub pinta
+en el README. El color es una consecuencia del número: verde si todo el corpus
+es fiel, ámbar por encima del 90 %, rojo si el port se ha desviado. El número va
+dentro del SVG como texto y como `aria-label`, así que la chapa se lee también
+en blanco y negro y con lector de pantalla.
+
 ---
 
 ## 8. Resultados

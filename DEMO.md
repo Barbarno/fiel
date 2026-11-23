@@ -311,6 +311,11 @@ Cambia a la pestaña del navegador con el pull request.
 > "La migración con IA demuestra la equivalencia el día que migras.
 > Esto la demuestra el día mil."
 
+Si alguien pregunta cómo se instala en su proyecto, la respuesta es una línea y
+no hay que enseñarla: `fiel guard` pone la comprobación en el hook de git y
+`fiel ci` escribe el workflow de GitHub. Las dos llevan `--pair` para vigilar
+solo las parejas que tienen que seguir siendo fieles.
+
 Fin. No digas nada más. Deja que pregunten.
 
 ---

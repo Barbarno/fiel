@@ -130,7 +130,7 @@ jobs:
           fi
 
   diagnostico:
-    name: doctor, coverage, probe y watch
+    name: doctor, coverage, probe, watch, badge y ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
