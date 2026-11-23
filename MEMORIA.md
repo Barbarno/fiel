@@ -137,10 +137,15 @@ fiel/
 ├── adapters.py     importa corpus de otras herramientas
 ├── mutate.py       añade entradas nuevas al corpus
 ├── demo.py         la historia completa, para presentar
+├── doctor.py      revisa que el entorno este listo antes de comprobar
+├── watch.py       repite la comprobacion cuando cambia un fichero
+├── coverage.py    cuenta las lineas del original que ejecuta el corpus
+├── probe.py       prueba una entrada suelta contra una pareja
+├── shrink.py      reduce un caso que diverge al minimo (ddmin)
 └── cli.py          los comandos
 ```
 
-2.642 líneas de motor, 66 pruebas automáticas, cero dependencias externas.
+3.584 líneas no vacías de motor, 91 pruebas automáticas, cero dependencias externas.
 
 ### 6.2 Los comandos
 
@@ -154,6 +159,11 @@ fiel/
 | `fiel bisect` | encuentra el commit que rompió la equivalencia |
 | `fiel report` | escribe el informe HTML |
 | `fiel demo` | ejecuta la demostración completa |
+| `fiel doctor` | revisa el entorno: intérprete, corpus, comandos que arrancan |
+| `fiel watch` | repite la comprobación cuando cambia un fichero |
+| `fiel coverage` | mide cuántas líneas del original ejecuta el corpus |
+| `fiel probe` | prueba una entrada suelta, sin grabarla en el corpus |
+| `fiel shrink` | reduce un caso que diverge al mínimo que sigue fallando |
 
 ### 6.3 El corpus
 
@@ -188,7 +198,7 @@ formato y la herramienta sería inservible.
 
 ### 7.1 Pruebas automáticas
 
-66 pruebas unitarias sobre el motor: comparación, normalización, corpus,
+91 pruebas unitarias sobre el motor: comparación, normalización, corpus,
 baseline, importación, informe y CLI. Se ejecutan en menos de un segundo.
 
 ### 7.2 Integración continua
@@ -297,6 +307,34 @@ reescrita a mano ya no es equivalente, y nadie lo nota hasta que se prueba a
 propósito.** El corpus se reconstruye con `python estudio/portes/casos.py` y las
 divergencias se listan con `python estudio/portes/probe.py`. El detalle de las
 seis parejas está en `estudio/portes/LEEME.md`.
+
+### 7.7 Cuánto del original ejecuta el corpus
+
+La crítica más justa a este proyecto es que un corpus solo demuestra lo que
+contiene. `fiel coverage` le pone número a esa frase: ejecuta el original una
+vez por caso, con el módulo `trace` de la biblioteca estándar, y cuenta cuántas
+líneas con sentencia se han ejecutado al menos una vez.
+
+| pareja | casos | sentencias | cubiertas | % |
+|---|---:|---:|---:|---:|
+| `cron` (demo) | 10 | 28 | 27 | 96,4 % |
+| `url` | 40 | 61 | 42 | 68,9 % |
+| `toml` | 40 | 134 | 108 | 80,6 % |
+| `slug` | 40 | 30 | 26 | 86,7 % |
+| `semver` real | 40 | 25 | 22 | 88,0 % |
+| **todo `fiel.estudio.toml`** | **312** | **729** | **609** | **83,5 %** |
+
+Que la cifra global sea 83,5 % y no 100 % es el dato interesante, y va en la
+memoria tal cual. En `url`, por ejemplo, quedan sin tocar 19 líneas: ramas de
+error que el corpus nunca provoca. Un port puede haberlas escrito de otra
+forma y la comprobación no lo verá. Saber dónde está ese hueco vale más que un
+porcentaje redondo; por eso el comando imprime los rangos exactos y admite
+`--min 80`, que devuelve código 1 cuando la cobertura baja del umbral.
+
+Las seis reescrituras a mano dan 100 % de cobertura con siete u ocho
+sentencias cada una: son funciones de una sola rama y el corpus las recorre
+entera. La diferencia entre 100 % ahí y 68,9 % en `url` no mide la calidad del
+corpus, mide el tamaño del programa original.
 
 ---
 

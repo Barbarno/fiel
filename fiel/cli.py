@@ -12,14 +12,19 @@ from . import adapters
 from . import adequacy as adequacy_mod
 from . import check as check_mod
 from . import corpus as corpus_mod
+from . import coverage as coverage_mod
 from . import gate as gate_mod
 from . import mutate
+from . import probe as probe_mod
+from . import shrink as shrink_mod
 from .bisect import BisectError, run_bisect
 from .bot import BotError, resolve_token, upsert_comment
 from .demo import run_demo
+from .doctor import cmd_doctor
 from .report import console, github_annotations, markdown
 from .report_html import write as write_html
 from .spec import SpecError, TEMPLATE, load
+from .watch import cmd_watch
 
 EXIT_OK = 0
 EXIT_DIVERGENCE = 1
@@ -339,6 +344,115 @@ def cmd_gate(args: argparse.Namespace) -> int:
     return EXIT_DIVERGENCE if result.dependent else EXIT_OK
 
 
+def cmd_coverage(args: argparse.Namespace) -> int:
+    project = load(_root(args), args.spec)
+    try:
+        result = coverage_mod.medir(project, pairs=args.pair)
+    except ValueError as exc:
+        print(f"fiel: {exc}", file=sys.stderr)
+        return EXIT_ERROR
+
+    if args.format == "json":
+        print(json.dumps(coverage_mod.as_json(result), indent=2, ensure_ascii=False))
+    elif args.format == "markdown":
+        print(coverage_mod.markdown(result))
+    else:
+        print(coverage_mod.console(result))
+
+    if result.errors:
+        return EXIT_ERROR
+    if args.min and result.porcentaje < args.min:
+        print(
+            f"fiel: el corpus solo ejecuta el {result.porcentaje:.1f}% del original "
+            f"(minimo pedido: {args.min:g}%)",
+            file=sys.stderr,
+        )
+        return EXIT_DIVERGENCE
+    return EXIT_OK
+
+
+def cmd_shrink(args: argparse.Namespace) -> int:
+    project = load(_root(args), args.spec)
+    try:
+        resultados = shrink_mod.shrink_casos(
+            project,
+            pairs=args.pair,
+            casos=args.case,
+            presupuesto=args.budget,
+            cualquier=args.any,
+            todos=args.all,
+        )
+    except (ValueError, shrink_mod.ShrinkError, corpus_mod.CorpusError) as exc:
+        print(f"fiel: {exc}", file=sys.stderr)
+        return EXIT_ERROR
+
+    if not resultados:
+        print("nada que reducir: no hay divergencias en lo seleccionado")
+        return EXIT_OK
+
+    if args.format == "json":
+        print(json.dumps(shrink_mod.as_json(resultados), indent=2, ensure_ascii=False))
+    elif args.format == "markdown":
+        print(shrink_mod.markdown(resultados))
+    else:
+        por_id = {pair.id: pair for pair in project.pairs}
+        for resultado in resultados:
+            print(shrink_mod.console(resultado, por_id[resultado.pair_id]))
+            print("")
+
+    if args.write:
+        por_id = {pair.id: pair for pair in project.pairs}
+        for resultado in resultados:
+            pair = por_id[resultado.pair_id]
+            try:
+                nuevo = shrink_mod.escribir_caso(project, pair, resultado)
+            except (shrink_mod.ShrinkError, corpus_mod.CorpusError) as exc:
+                print(f"fiel: {exc}", file=sys.stderr)
+                return EXIT_ERROR
+            print(f"{nuevo} anadido a {pair.corpus} (siguiente: 'fiel check')")
+
+    return EXIT_OK
+
+
+def cmd_probe(args: argparse.Namespace) -> int:
+    project = load(_root(args), args.spec)
+    if not args.pair:
+        print("fiel: indica la pareja con --pair", file=sys.stderr)
+        return EXIT_ERROR
+    if len(args.pair) > 1:
+        print("fiel: probe trabaja sobre una sola pareja", file=sys.stderr)
+        return EXIT_ERROR
+
+    entradas: list[bytes] = []
+    if args.stdin:
+        entradas.append(sys.stdin.buffer.read())
+    for texto in args.input or []:
+        try:
+            entradas.append(probe_mod.leer_entrada(texto))
+        except probe_mod.ProbeError as exc:
+            print(f"fiel: {exc}", file=sys.stderr)
+            return EXIT_ERROR
+    if not entradas:
+        print("fiel: indica --input o --stdin", file=sys.stderr)
+        return EXIT_ERROR
+
+    try:
+        pair = probe_mod.obtener(project, args.pair[0])
+        resultados = [probe_mod.una(pair, project, entrada) for entrada in entradas]
+    except probe_mod.ProbeError as exc:
+        print(f"fiel: {exc}", file=sys.stderr)
+        return EXIT_ERROR
+
+    if args.format == "json":
+        print(json.dumps([probe_mod.as_json(r) for r in resultados], indent=2, ensure_ascii=False))
+    else:
+        for resultado in resultados:
+            print(probe_mod.console(resultado))
+            print("")
+
+    return EXIT_OK if all(r.fiel for r in resultados) else EXIT_DIVERGENCE
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="fiel", description="mantiene un port fiel a su original")
     parser.add_argument("--version", action="version", version=f"fiel {__version__}")
@@ -427,6 +541,42 @@ def build_parser() -> argparse.ArgumentParser:
     p_gate.add_argument("--sample", type=int, default=20, help="casos a comprobar (por defecto: 20)")
     p_gate.add_argument("--format", choices=["console", "json"], default="console")
     p_gate.set_defaults(func=cmd_gate)
+
+    p_doctor = sub.add_parser("doctor", help="revisa que el entorno este listo para comprobar")
+    add_common(p_doctor)
+    p_doctor.add_argument("--smoke", action="store_true", help="ademas ejecuta el primer caso de cada pareja")
+    p_doctor.set_defaults(func=cmd_doctor)
+
+    p_watch = sub.add_parser("watch", help="repite la comprobacion cuando cambia un fichero")
+    add_common(p_watch)
+    p_watch.add_argument("--interval", type=float, default=1.0, help="segundos entre revisiones (por defecto: 1)")
+    p_watch.add_argument("--path", action="append", help="fichero o carpeta adicional que vigilar (repetible)")
+    p_watch.add_argument("--vueltas", type=int, default=None, help=argparse.SUPPRESS)
+    p_watch.add_argument("--quiet", action="store_true", help="no imprime el resultado de cada vuelta")
+    p_watch.set_defaults(func=cmd_watch)
+
+    p_cov = sub.add_parser("coverage", help="mide cuantas lineas del original ejecuta el corpus")
+    add_common(p_cov)
+    p_cov.add_argument("--min", type=float, default=0.0, help="exit 1 si el corpus no llega a este porcentaje")
+    p_cov.add_argument("--format", choices=["console", "markdown", "json"], default="console")
+    p_cov.set_defaults(func=cmd_coverage)
+
+    p_shr = sub.add_parser("shrink", help="reduce un caso que diverge al minimo que sigue divergiendo")
+    add_common(p_shr)
+    p_shr.add_argument("--case", action="append", help="caso a reducir (repetible)")
+    p_shr.add_argument("--all", action="store_true", help="reduce todas las divergencias de la pareja")
+    p_shr.add_argument("--budget", type=int, default=shrink_mod.PRESUPUESTO, help="ejecuciones por caso")
+    p_shr.add_argument("--any", action="store_true", help="vale cualquier divergencia, no solo la misma")
+    p_shr.add_argument("--write", action="store_true", help="anade la entrada minima al corpus")
+    p_shr.add_argument("--format", choices=["console", "markdown", "json"], default="console")
+    p_shr.set_defaults(func=cmd_shrink)
+
+    p_prb = sub.add_parser("probe", help="prueba una entrada suelta contra una pareja")
+    add_common(p_prb)
+    p_prb.add_argument("--input", action="append", help="entrada a probar; @fichero para leerla de disco (repetible)")
+    p_prb.add_argument("--stdin", action="store_true", help="lee la entrada de la entrada estandar")
+    p_prb.add_argument("--format", choices=["console", "json"], default="console")
+    p_prb.set_defaults(func=cmd_probe)
 
     return parser
 

@@ -154,9 +154,75 @@ idempotente listo para publicar.
 | `fiel comment` | publica o actualiza el informe en un pull request |
 | `fiel report` | escribe un informe HTML en un solo fichero (`--out`, `--open`) |
 | `fiel demo` | la historia completa, sin preparar nada |
+| `fiel doctor` | revisa el entorno antes de la demo: intérprete, corpus, comandos que arrancan |
+| `fiel watch` | repite la comprobación en cuanto cambia un fichero |
+| `fiel coverage` | cuántas líneas del original ejecuta el corpus, y cuáles no |
+| `fiel probe` | prueba una entrada suelta ahora mismo, sin grabarla |
+| `fiel shrink` | reduce un caso que diverge al mínimo que sigue divergiendo |
 
 Opciones útiles de `check`: `--pair`, `--case`, `--jobs`, `--strict` (ignora el
 baseline), `--no-baseline`, `--format console|markdown|github|json`.
+
+## Cuatro comandos que se usan en la mesa
+
+No son adorno: cada uno responde a una pregunta que aparece en mitad de una
+revisión.
+
+**«¿Esta entrada concreta la traga igual?»** — `fiel probe`. Se lanzan los dos
+lados con esos bytes y se comparan, sin tocar el corpus:
+
+```bash
+$ fiel probe --pair url --input "http://host/a#b"
+entrada   http://host/a#b
+original  ok: http|host|/a||b
+port      ok: http|host|/a#b||
+tipo      output
+desde     el caracter 12
+veredicto NO FIEL
+```
+
+Sale 0 si es fiel y 1 si no, así que vale dentro de un `if` o de un hook. Con
+`@fichero` lee la entrada de disco y con `--stdin` de una tubería.
+
+**«¿Cuánto del original queda sin probar?»** — `fiel coverage`. Cuenta las
+líneas con sentencia que el corpus ejecuta al menos una vez:
+
+```bash
+$ fiel coverage --pair url
+url
+  original    examples\targets\url\original.py
+  casos       40
+  sentencias  61
+  cubiertas   42  (68.9%)
+  sin tocar   23, 26, 29, 42, 49-57, 59, 66, 72, 75, 97-98
+```
+
+Lo que el corpus no toca es exactamente donde el port puede haberse desviado
+sin que nadie se entere. Con `--min 80` devuelve 1 por debajo del umbral, para
+poder exigirlo en integración continua.
+
+**«¿Por qué falla esta entrada de 200 bytes?»** — `fiel shrink`. Reduce el caso
+a lo mínimo que sigue fallando (ddmin, Zeller y Hildebrandt 2002) y, si se le
+pide, lo guarda como caso permanente:
+
+```bash
+$ fiel shrink --pair cron-roto --case c0004 --write
+```
+
+**«¿Por qué no arranca en el portátil del tribunal?»** — `fiel doctor`. Revisa
+intérprete, especificación, corpus, permisos y que los dos lados de cada pareja
+se puedan lanzar; con `--smoke` ejecuta además el primer caso:
+
+```bash
+$ fiel doctor --smoke
+  OK   interprete  -  Python 3.13.17
+  OK   parejas  -  2 definidas
+  OK   cron-fiel: los dos lados arrancan  -  caso c0001
+  !    baseline  -  no hay: se comprueba todo el corpus
+```
+
+Y `fiel watch` cierra el círculo: deja la comprobación corriendo y la repite en
+cuanto cambia el corpus o cualquiera de los programas.
 
 ## Lo que el corpus no cubre
 
@@ -404,7 +470,8 @@ El PR se cerró sin fusionar para dejar `main` en verde. El registro queda ahí.
 python -m unittest discover -s tests -v
 ```
 
-66 pruebas, sin dependencias externas.
+91 pruebas, sin dependencias externas. Veinticuatro de ellas cubren los comandos
+de diagnóstico: `coverage`, `probe`, `shrink`, `doctor` y `watch`.
 
 ## Qué no hace
 

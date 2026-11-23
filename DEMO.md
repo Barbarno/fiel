@@ -1,8 +1,8 @@
 # Guion de la demostración
 
-Duración: **unos 6 minutos** de reloj, 5 de ellos hablando. Diez actos.
+Duración: **unos 7 minutos** de reloj, 5 de ellos hablando. Doce actos.
 Todo pasa en tu portátil. No hace falta internet, ni GitHub, ni permisos.
-El único acto que usa el navegador es el 7 (abre un HTML local) y el 10
+El único acto que usa el navegador es el 9 (abre un HTML local) y el 12
 (enseña el pull request ya abierto en otra pestaña).
 
 ---
@@ -10,7 +10,7 @@ El único acto que usa el navegador es el 7 (abre un HTML local) y el 10
 ## Antes de empezar (5 minutos antes, en el pasillo)
 
 1. Abre una terminal **nueva** en `C:\Users\Dano\Documents\Default Project\fiel`.
-2. Comprueba que responde: `fiel --version` → debe decir `fiel 0.2.0`.
+2. Comprueba que responde: `fiel --version` → debe decir `fiel 0.3.0`.
    Si no responde: `python -m fiel --version` y usa esa forma en todo el guion.
 3. Ten abierta en el navegador, en otra pestaña, esta dirección:
    `https://github.com/Barbarno/fiel/pull/1`
@@ -34,7 +34,7 @@ cargo build --release --target x86_64-pc-windows-gnu --manifest-path examples\ta
 cargo build --release --target x86_64-pc-windows-gnu --manifest-path examples\real-semver\rust-port\Cargo.toml
 ```
 
-El acto 9 no necesita compilar nada: son dos scripts de Python.
+El acto 11 no necesita compilar nada: son dos scripts de Python.
 
 6. Si algo va mal, tienes el plan B al final de este documento.
 
@@ -165,7 +165,64 @@ cron-rust: 10/13 fieles
 
 ---
 
-## Acto 7 — El informe, en una pantalla (40 segundos)
+## Acto 7 — Lo que el corpus no toca (35 segundos)
+
+```powershell
+fiel --spec fiel.estudio.toml coverage --pair url
+```
+
+```
+url
+  original    examples\targets\url\original.py
+  casos       40
+  sentencias  61
+  cubiertas   42  (68.9%)
+  sin tocar   23, 26, 29, 42, 49-57, 59, 66, 72, 75, 97-98
+```
+
+> "Aquí está la pregunta que me van a hacer: ¿y lo que no has probado?
+> Esta es la respuesta, con números. El corpus ejecuta 42 de las 61 líneas
+> del original. Las 19 que no ejecuta son ramas de error que nadie probó, y
+> son exactamente donde un port puede desviarse sin que salte nada.
+> Prefiero enseñar el 68,9 % que decir «todo cubierto». Con `--min 80` el
+> comando devuelve 1 y la integración continua no te deja bajar de ahí."
+
+---
+
+## Acto 8 — La entrada que dicta el tribunal (45 segundos)  **el tercer momento**
+
+Aquí se para el guion y se le pide una entrada a alguien del tribunal.
+
+```powershell
+fiel --root estudio/portes probe --pair mano-url --input "http://host/a#b"
+```
+
+```
+entrada   http://host/a#b
+original  ok: http|host|/a||b
+port      ok: http|host|/a#b||
+tipo      output
+desde     el caracter 12
+veredicto NO FIEL
+```
+
+> "Esa URL no está en ningún corpus: la acabo de escribir. No hay nada grabado,
+> no hay nada preparado. Se lanzan las dos implementaciones con esos bytes y se
+> comparan. 200 milisegundos."
+
+Y la misma entrada, contra el port bueno de Rust:
+
+```powershell
+fiel --spec fiel.estudio.toml probe --pair url --input "http://host/a#b"
+```
+
+> "Misma entrada, veredicto distinto. La herramienta no dice que todo esté mal:
+> dice dónde. Sale 0 cuando es fiel y 1 cuando no, así que esto también se
+> puede meter en un `if` o en un hook de git."
+
+---
+
+## Acto 9 — El informe, en una pantalla (40 segundos)
 
 ```powershell
 fiel --spec fiel.estudio.toml report --out informe.html --open
@@ -185,7 +242,7 @@ fichero desde la carpeta.
 
 ---
 
-## Acto 8 — Dos bibliotecas reales (40 segundos)
+## Acto 10 — Dos bibliotecas reales (40 segundos)
 
 ```powershell
 fiel --root examples/real-semver check --pair semver-real-trampas
@@ -216,7 +273,7 @@ fiel --root examples/real-semver check --pair semver-real-fijo
 
 ---
 
-## Acto 9 — Seis reescrituras a mano (35 segundos)
+## Acto 11 — Seis reescrituras a mano (35 segundos)
 
 ```powershell
 fiel --root estudio/portes check --pair mano-csv --pair mano-csv-trampas
@@ -237,7 +294,7 @@ mano-csv-trampas:  2/8 fieles  [6 divergencias]
 
 ---
 
-## Acto 10 — El registro (30 segundos)
+## Acto 12 — El registro (30 segundos)
 
 Cambia a la pestaña del navegador con el pull request.
 
@@ -273,9 +330,11 @@ Fin. No digas nada más. Deja que pregunten.
 > olvidan; el corpus se amplía solo con `fiel add` cada vez que aparece un fallo.
 
 **"¿Qué pasa si el corpus no cubre un caso?"**
-> Que no lo detecta. Es el límite y está en el README. Por eso `fiel add`
-> existe: cada fallo real se añade y queda cubierto para siempre. La garantía
-> crece con el uso, no nace completa.
+> Que no lo detecta. Es el límite del método y está en el README. Pero no lo
+> dejo en "confía en mí": `fiel coverage` cuenta cuántas líneas del original
+> ejecuta el corpus y dice cuáles no. En el estudio entero son 609 de 729,
+> el 83,5 %. Las 120 que faltan están impresas, con número de línea: cualquiera
+> puede comprobarlas. Prefiero un 83,5 % honesto a un 100 % de mentira.
 
 **"¿Cómo sabes que la comparación es justa?"**
 > Normalizando antes de comparar. `text` iguala saltos de línea y quita espacios
@@ -293,16 +352,17 @@ Fin. No digas nada más. Deja que pregunten.
 > fidelidad no tiene por qué ser monótona y una búsqueda binaria puede mentir.
 
 **"¿Cuánto tarda?"**
-> Los 312 casos, tres segundos. La demo entera, menos de dos. En GitHub, el
+> Los 312 casos, segundo y medio. La demo entera, trece segundos. En GitHub, el
 > trabajo completo tarda entre veinte y treinta segundos, y la mayoría es
 > instalar y compilar.
 
 **"¿Qué harías con más tiempo?"**
 > Completar el estudio con dos modelos gratuitos más (el generador ya está
-> hecho; faltan las claves), y adaptar el corpus de `rust-anything` para medir
-> ports que no sean míos. Lo que no haría es añadir funciones: cinco ejemplos y
-> seis reescrituras a mano ya cubren los cuatro modos de fallo que me interesan
-> —números, texto, Unicode y decisiones de API.
+> hecho; faltan las claves) y adaptar el corpus de `rust-anything` para medir
+> ports que no sean míos. Lo que no haría es añadir funciones por añadir: las
+> cinco de diagnóstico —`coverage`, `probe`, `shrink`, `doctor` y `watch`— ya
+> están dentro porque cada una responde a una pregunta que me hicieron. Lo que
+> queda no es más código, es más medición.
 
 ---
 
@@ -311,8 +371,8 @@ Fin. No digas nada más. Deja que pregunten.
 | si falla | qué haces |
 |---|---|
 | `fiel` no se reconoce | usa `python -m fiel` en todos los comandos |
-| un binario de Rust no está compilado | salta ese acto: el 6 avisa de que falta, el 8 solo necesita `semver-rs`, el 9 no compila nada |
-| no hay internet | los actos 1 a 9 no lo necesitan (el 7 abre un HTML local); el 10 lo cuentas de palabra |
+| un binario de Rust no está compilado | salta ese acto: el 7 y el 8 necesitan `url-rs`, el 10 necesita `semver-rs`, el 11 no compila nada |
+| no hay internet | los actos 1 a 11 no lo necesitan (el 9 abre un HTML local); el 12 lo cuentas de palabra |
 | `fiel demo` falla | ejecuta los actos 2 a 4 a mano; son el 80% de la demo |
 | el informe no se abre | ejecuta `fiel --spec fiel.estudio.toml report --out informe.html` y ábrelo desde la carpeta |
 | se te va el tiempo | actos 3, 6 y 9 son los que hay que enseñar sí o sí |

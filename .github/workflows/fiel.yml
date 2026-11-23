@@ -128,3 +128,39 @@ jobs:
             echo "::error::se esperaban al menos 35 divergencias en el corpus de trampas"
             exit 1
           fi
+
+  diagnostico:
+    name: doctor, coverage, probe y watch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Instalar fiel
+        run: pip install .
+
+      - name: El entorno esta listo y los dos lados arrancan
+        run: fiel --root examples/demo doctor --smoke
+
+      - name: El corpus ejecuta la mayor parte del original
+        run: fiel --root examples/demo coverage --pair cron-fiel --min 90
+
+      - name: La cobertura del estudio se imprime, sin umbral
+        run: fiel --spec fiel.estudio.toml coverage --format markdown
+
+      - name: Probe dice la verdad en las dos direcciones
+        run: |
+          set +e
+          fiel --root estudio/portes probe --pair mano-url --input "http://host/a#b"
+          malo=$?
+          fiel --root estudio/portes probe --pair mano-url --input "http://host/a"
+          bueno=$?
+          echo "no fiel -> $malo (se espera 1); fiel -> $bueno (se espera 0)"
+          test "$malo" -eq 1
+          test "$bueno" -eq 0
+
+      - name: Watch da una vuelta y termina
+        run: fiel --root examples/demo watch --pair cron-fiel --vueltas 1 --interval 0.1 --quiet

@@ -94,7 +94,37 @@ try {
     Pausa
 
     # ---------------------------------------------------------------
-    Paso "7. El informe: los mismos numeros, en una pantalla"
+    Paso "7. Cuanto del original queda sin probar"
+    Comando "python -m fiel --spec fiel.estudio.toml coverage --pair url"
+    Fiel --spec fiel.estudio.toml coverage --pair url
+    Write-Host ""
+    Write-Host "  61 sentencias, 42 ejecutadas por el corpus. Las 19 que faltan" -ForegroundColor DarkYellow
+    Write-Host "  son el hueco real: ahi un port puede desviarse sin que se vea." -ForegroundColor DarkYellow
+    Pausa
+
+    # ---------------------------------------------------------------
+    Paso "8. La entrada que dicta el tribunal"
+    $entrada = "http://host/a#b"
+    Write-Host ""
+    Write-Host "  Esta URL no esta en ningun corpus. Se escribe ahora mismo." -ForegroundColor DarkGray
+    if (-not $NoPause) {
+        Write-Host "  Escribe una (Enter para dejar $entrada): " -ForegroundColor Yellow -NoNewline
+        $leida = Read-Host
+        if ($leida) { $entrada = $leida }
+    }
+    Comando "python -m fiel --root estudio/portes probe --pair mano-url --input ""$entrada"""
+    Fiel --root estudio/portes probe --pair mano-url --input $entrada
+    Write-Host ""
+    Write-Host "  Esa es la reescritura a mano. La misma entrada, contra el port" -ForegroundColor DarkGray
+    Write-Host "  bueno de Rust:" -ForegroundColor DarkGray
+    Comando "python -m fiel --spec fiel.estudio.toml probe --pair url --input ""$entrada"""
+    Fiel --spec fiel.estudio.toml probe --pair url --input $entrada
+    Write-Host ""
+    Write-Host "  Dos veredictos distintos con la misma entrada, en menos de un segundo." -ForegroundColor Green
+    Pausa
+
+    # ---------------------------------------------------------------
+    Paso "9. El informe: los mismos numeros, en una pantalla"
     if ($NoPause) {
         Comando "python -m fiel --spec fiel.estudio.toml report --out informe.html"
         Fiel --spec fiel.estudio.toml report --out informe.html
@@ -108,7 +138,7 @@ try {
     Pausa
 
     # ---------------------------------------------------------------
-    Paso "8. Dos bibliotecas reales del mismo estandar"
+    Paso "10. Dos bibliotecas reales del mismo estandar"
     Comando "python -m fiel --root examples/real-semver check --pair semver-real-trampas"
     Fiel --root examples/real-semver check --pair semver-real-trampas
     Write-Host ""
@@ -121,7 +151,7 @@ try {
     Pausa
 
     # ---------------------------------------------------------------
-    Paso "9. Seis funciones de la stdlib reescritas a mano"
+    Paso "11. Seis funciones de la stdlib reescritas a mano"
     Comando "python -m fiel --root estudio/portes check --pair mano-csv --pair mano-csv-trampas"
     Fiel --root estudio/portes check --pair mano-csv --pair mano-csv-trampas
     Write-Host ""
@@ -130,7 +160,7 @@ try {
     Pausa
 
     # ---------------------------------------------------------------
-    Paso "10. El registro: un pull request real con el check en rojo"
+    Paso "12. El registro: un pull request real con el check en rojo"
     $url = "https://github.com/Barbarno/fiel/pull/1"
     Write-Host ""
     Write-Host "  $url" -ForegroundColor Blue
@@ -158,3 +188,7 @@ finally {
     }
     Set-Location $root
 }
+
+# Un acto termina con el check en rojo a proposito (la entrada que no es fiel).
+# El guion, como pieza, sale siempre bien.
+exit 0
