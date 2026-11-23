@@ -165,6 +165,45 @@ jobs:
       - name: Watch da una vuelta y termina
         run: fiel --root examples/demo watch --pair cron-fiel --vueltas 1 --interval 0.1 --quiet
 
+      - name: La chapa sale en verde y es XML valido
+        run: |
+          fiel --root examples/demo badge --pair cron-fiel --out "$RUNNER_TEMP/chapa.svg"
+          python - "$RUNNER_TEMP/chapa.svg" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          texto = open(sys.argv[1], encoding="utf-8").read()
+          raiz = ET.fromstring(texto)
+          assert raiz.tag.endswith("svg"), raiz.tag
+          assert "10/10" in raiz.get("aria-label", ""), raiz.get("aria-label")
+          sin_ns = texto.replace('xmlns="http://www.w3.org/2000/svg"', "")
+          for prohibido in ("http://", "https://", "<script"):
+              assert prohibido not in sin_ns, prohibido
+          print("chapa correcta")
+          PY
+
+      - name: El ejemplo roto sale en rojo y con codigo 1
+        run: |
+          set +e
+          fiel --root examples/demo badge --pair cron-roto --out "$RUNNER_TEMP/roja.svg"
+          codigo=$?
+          set -e
+          echo "chapa roja -> $codigo (se espera 1)"
+          test "$codigo" -eq 1
+          grep -q '#8c2f24' "$RUNNER_TEMP/roja.svg"
+
+      - name: El XML de JUnit se puede parsear
+        run: |
+          set +e
+          fiel --root examples/demo check --pair cron-roto --format junit > "$RUNNER_TEMP/junit.xml"
+          set -e
+          python - "$RUNNER_TEMP/junit.xml" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          raiz = ET.parse(sys.argv[1]).getroot()
+          assert raiz.get("tests") == "10", raiz.get("tests")
+          assert raiz.get("failures") == "2", raiz.get("failures")
+          assert len(raiz.findall(".//failure")) == 2
+          print("junit correcto")
+          PY
+
   puerta:
     name: el hook de git bloquea un commit roto
     runs-on: ubuntu-latest

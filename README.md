@@ -1,6 +1,7 @@
 ﻿# fiel
 
 ![fiel](https://github.com/Barbarno/fiel/actions/workflows/fiel.yml/badge.svg)
+![ejemplo: 10 de 10 fieles](fiel-demo.svg)
 
 **La equivalencia no se demuestra una vez. Se mantiene.**
 
@@ -160,9 +161,10 @@ idempotente listo para publicar.
 | `fiel probe` | prueba una entrada suelta ahora mismo, sin grabarla |
 | `fiel shrink` | reduce un caso que diverge al mínimo que sigue divergiendo |
 | `fiel guard` | instala `fiel check` como hook de git: no se commitea una divergencia nueva |
+| `fiel badge` | escribe una chapa SVG con el resultado, para el README |
 
 Opciones útiles de `check`: `--pair`, `--case`, `--jobs`, `--strict` (ignora el
-baseline), `--no-baseline`, `--format console|markdown|github|json`.
+baseline), `--no-baseline`, `--format console|markdown|github|json|junit`.
 
 ## Cinco comandos que se usan en la mesa
 
@@ -244,6 +246,26 @@ a las parejas que tienen que seguir siendo fieles —el ejemplo del repositorio
 tiene una rota a propósito— y `fiel guard --remove` lo quita. Si el fichero del
 hook ya existía y lo escribió otra herramienta, se niega a pisarlo salvo con
 `--force`.
+
+**Dos formatos más, para no inventar nada.** `fiel check --format junit`
+escribe XML de JUnit, así que Jenkins, GitLab o cualquier CI que ya sepa leer
+tests enseña las divergencias como fallos, sin escribir un adaptador:
+
+```xml
+<testsuites name="fiel" tests="10" failures="2" errors="0">
+  <testsuite name="cron-roto" tests="10" failures="2" errors="0">
+    <testcase classname="fiel" name="cron-roto.c0004">
+      <failure message="output" type="output">tipo: output
+original: 5,6,7,8,9
+port: 5,6,7,8</failure>
+    </testcase>
+```
+
+Y `fiel badge --out fiel.svg` escribe la chapa de arriba: un SVG suelto, sin
+JavaScript y sin servicios, que se commitea y GitHub pinta en el README. Verde
+si todo el corpus sigue siendo fiel, ámbar por encima del 90 %, rojo si el port
+se ha desviado de verdad. El texto va siempre dentro, para que se lea también
+en blanco y negro y con lector de pantalla.
 
 ## Lo que el corpus no cubre
 

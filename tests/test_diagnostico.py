@@ -16,12 +16,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fiel import check as check_mod
+from fiel import badge as badge_mod
 from fiel import cli
 from fiel import corpus as corpus_mod
 from fiel import coverage as coverage_mod
 from fiel import doctor as doctor_mod
 from fiel import guard as guard_mod
 from fiel import probe as probe_mod
+from fiel import report as report_mod
 from fiel import shrink as shrink_mod
 from fiel import watch as watch_mod
 from fiel.spec import Project, load
@@ -267,6 +269,105 @@ class GuardTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaises(guard_mod.GuardError):
                 guard_mod.estado(Path(tmp))
+
+
+class BadgeTests(unittest.TestCase):
+    def _resultado(self, fieles: int, total: int) -> check_mod.CheckResult:
+        resultado = check_mod.CheckResult()
+        resultado.pairs.append(
+            check_mod.PairResult(pair_id="p", total=total, passed=fieles, cases=[])
+        )
+        return resultado
+
+    def test_todo_fiel_es_verde(self) -> None:
+        chapa = badge_mod.resumen(self._resultado(10, 10))
+        self.assertEqual(chapa.color, badge_mod.VERDE)
+        self.assertEqual(chapa.valor, "10/10")
+
+    def test_casi_todo_fiel_es_ambar(self) -> None:
+        chapa = badge_mod.resumen(self._resultado(95, 100))
+        self.assertEqual(chapa.color, badge_mod.AMBAR)
+
+    def test_desviado_es_rojo(self) -> None:
+        chapa = badge_mod.resumen(self._resultado(5, 100))
+        self.assertEqual(chapa.color, badge_mod.ROJO)
+
+    def test_sin_casos_no_presume_de_verde(self) -> None:
+        chapa = badge_mod.resumen(self._resultado(0, 0))
+        self.assertEqual(chapa.color, badge_mod.GRIS)
+        self.assertEqual(chapa.valor, "sin casos")
+
+    def test_el_svg_es_xml_valido_y_se_explica_solo(self) -> None:
+        import xml.etree.ElementTree as ET
+
+        chapa = badge_mod.resumen(self._resultado(10, 10))
+        arbol = ET.fromstring(badge_mod.svg(chapa))
+
+        self.assertEqual(arbol.tag, "{http://www.w3.org/2000/svg}svg")
+        self.assertEqual(arbol.get("role"), "img")
+        self.assertIn("10/10", arbol.get("aria-label", ""))
+        self.assertIsNotNone(arbol.find("{http://www.w3.org/2000/svg}title"))
+
+    def test_el_svg_no_tiene_recursos_remotos(self) -> None:
+        texto = badge_mod.svg(badge_mod.resumen(self._resultado(3, 4)))
+        sin_espacio_de_nombres = texto.replace('xmlns="http://www.w3.org/2000/svg"', "")
+        for prohibido in ("http://", "https://", "<script", "@import"):
+            self.assertNotIn(prohibido, sin_espacio_de_nombres)
+
+    def test_el_comando_escribe_el_fichero(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            destino = Path(tmp) / "sub" / "chapa.svg"
+            codigo = cli.main(
+                ["--root", str(DEMO), "badge", "--pair", "cron-fiel", "--out", str(destino)]
+            )
+            self.assertEqual(codigo, cli.EXIT_OK)
+            self.assertIn("<svg", destino.read_text(encoding="utf-8"))
+
+    def test_un_port_infiel_pinta_rojo_y_sale_con_1(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            destino = Path(tmp) / "chapa.svg"
+            codigo = cli.main(
+                ["--root", str(DEMO), "badge", "--pair", "cron-roto", "--out", str(destino)]
+            )
+            self.assertEqual(codigo, cli.EXIT_DIVERGENCE)
+            self.assertIn(badge_mod.ROJO, destino.read_text(encoding="utf-8"))
+
+
+class JunitTests(unittest.TestCase):
+    def _xml(self, *args: str):
+        import xml.etree.ElementTree as ET
+
+        proyecto = load(DEMO)
+        resultado = check_mod.check(proyecto, pairs=list(args), jobs=2)
+        conocido, nuevo = check_mod.split_by_baseline(resultado, {})
+        return ET.fromstring(report_mod.junit(resultado, conocido, nuevo, strict=False))
+
+    def test_un_testcase_por_caso(self) -> None:
+        arbol = self._xml("cron-fiel")
+        self.assertEqual(arbol.get("tests"), "10")
+        self.assertEqual(arbol.get("failures"), "0")
+        casos = arbol.findall("./testsuite/testcase")
+        self.assertEqual(len(casos), 10)
+
+    def test_una_divergencia_es_un_fallo_con_las_dos_salidas(self) -> None:
+        arbol = self._xml("cron-roto")
+        self.assertEqual(arbol.get("failures"), "2")
+        fallos = arbol.findall(".//failure")
+        self.assertEqual(len(fallos), 2)
+        texto = "".join(f.text or "" for f in fallos)
+        self.assertIn("original:", texto)
+        self.assertIn("port:", texto)
+
+    def test_las_comillas_no_rompen_el_xml(self) -> None:
+        arbol = self._xml("cron-roto")
+        nombres = [c.get("name") or "" for c in arbol.findall(".//testcase")]
+        self.assertTrue(all('"' not in n for n in nombres))
+
+    def test_el_formato_junit_sale_por_la_linea_de_comandos(self) -> None:
+        codigo = cli.main(
+            ["--root", str(DEMO), "check", "--pair", "cron-fiel", "--format", "junit"]
+        )
+        self.assertEqual(codigo, cli.EXIT_OK)
 
 
 class CliTests(unittest.TestCase):

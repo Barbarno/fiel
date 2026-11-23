@@ -76,6 +76,68 @@ def markdown(result: CheckResult, known: list[Divergence], fresh: list[Divergenc
     return "\n".join(out)
 
 
+def junit(result: CheckResult, known: list[Divergence], fresh: list[Divergence], strict: bool) -> str:
+    """XML de JUnit: cualquier CI que ya sepa leer tests lo enseña sin configurar nada."""
+    failed_ids = {
+        (p.pair_id, d.case_id) for p in result.pairs for d in (fresh if not strict else p.divergences)
+    }
+    por_caso = {
+        (p.pair_id, d.case_id): d for p in result.pairs for d in (fresh if not strict else p.divergences)
+    }
+    total = result.total
+    fallos = len(failed_ids)
+    partes: list[str] = ['<?xml version="1.0" encoding="utf-8"?>']
+    partes.append(
+        f'<testsuites name="fiel" tests="{total}" failures="{fallos}" errors="{len(result.errors)}">'
+    )
+    for pair in result.pairs:
+        casos = pair.cases or []
+        fallos_pareja = sum(1 for cid in casos if (pair.pair_id, cid) in failed_ids)
+        partes.append(
+            f'  <testsuite name="{_attr(pair.pair_id)}" tests="{len(casos)}" '
+            f'failures="{fallos_pareja}" errors="{len(pair.errors)}">'
+        )
+        for cid in casos:
+            nombre = _attr(f"{pair.pair_id}.{cid}")
+            divergencia = por_caso.get((pair.pair_id, cid))
+            if divergencia is None:
+                partes.append(f'    <testcase classname="fiel" name="{nombre}" />')
+                continue
+            detalle = (
+                f"tipo: {divergencia.kind}\n"
+                f"original: {divergencia.original}\n"
+                f"port: {divergencia.port}"
+            )
+            partes.append(
+                f'    <testcase classname="fiel" name="{nombre}">'
+                f'<failure message="{_attr(divergencia.kind)}" type="{_attr(divergencia.kind)}">'
+                f"{_esc(detalle)}</failure></testcase>"
+            )
+        for error in pair.errors:
+            partes.append(
+                f'    <testcase classname="fiel" name="{_attr(pair.pair_id + ".error")}">'
+                f'<error message="{_attr(error)}" />'
+                "</testcase>"
+            )
+        partes.append("  </testsuite>")
+    partes.append("</testsuites>")
+    return "\n".join(partes)
+
+
+def _esc(texto: str) -> str:
+    return (
+        texto.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\r", "")
+    )
+
+
+def _attr(texto: str) -> str:
+    # XML no acepta comillas ni saltos dentro de un atributo
+    return _esc(texto).replace('"', "&quot;").replace("\n", " ")
+
+
 def github_annotations(result: CheckResult, fresh: list[Divergence]) -> str:
     lines: list[str] = []
     for divergence in fresh:

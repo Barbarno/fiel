@@ -10,6 +10,7 @@ from pathlib import Path
 from . import __version__
 from . import adapters
 from . import adequacy as adequacy_mod
+from . import badge as badge_mod
 from . import check as check_mod
 from . import corpus as corpus_mod
 from . import coverage as coverage_mod
@@ -22,7 +23,7 @@ from .bot import BotError, resolve_token, upsert_comment
 from .demo import run_demo
 from .doctor import cmd_doctor
 from .guard import cmd_guard
-from .report import console, github_annotations, markdown
+from .report import console, github_annotations, junit, markdown
 from .report_html import write as write_html
 from .spec import SpecError, TEMPLATE, load
 from .watch import cmd_watch
@@ -87,6 +88,8 @@ def cmd_check(args: argparse.Namespace) -> int:
 
     if args.format == "markdown":
         print(markdown(result, known, fresh, strict=args.strict))
+    elif args.format == "junit":
+        print(junit(result, known, fresh, strict=args.strict))
     elif args.format == "github":
         text = github_annotations(result, fresh if not args.strict else [d for p in result.pairs for d in p.divergences])
         if text:
@@ -102,6 +105,34 @@ def cmd_check(args: argparse.Namespace) -> int:
         return EXIT_ERROR
     failing = result.failed if args.strict else len(fresh)
     return EXIT_DIVERGENCE if failing else EXIT_OK
+
+
+def cmd_badge(args: argparse.Namespace) -> int:
+    try:
+        project = load(_root(args), args.spec)
+    except SpecError as exc:
+        print(f"fiel: {exc}", file=sys.stderr)
+        return EXIT_ERROR
+    try:
+        result = check_mod.check(
+            project,
+            pairs=args.pair,
+            jobs=args.jobs,
+            verify_original=not getattr(args, "no_verify_original", False),
+            case_filter=None,
+        )
+    except (ValueError, corpus_mod.CorpusError) as exc:
+        print(f"fiel: {exc}", file=sys.stderr)
+        return EXIT_ERROR
+    if result.errors:
+        for error in result.errors:
+            print(f"fiel: {error}", file=sys.stderr)
+        return EXIT_ERROR
+    destino = Path(args.out)
+    chapa = badge_mod.escribir(destino, result)
+    print(f"chapa escrita en {destino.resolve()}")
+    print(f"  {chapa.etiqueta} {chapa.valor}  ({chapa.fieles} de {chapa.total} casos)")
+    return EXIT_OK if chapa.fieles == chapa.total else EXIT_DIVERGENCE
 
 
 def _as_json(result, known, fresh, strict: bool) -> dict:
@@ -479,9 +510,18 @@ def build_parser() -> argparse.ArgumentParser:
     p_check.add_argument("--strict", action="store_true", help="ignora el baseline")
     p_check.add_argument("--no-baseline", action="store_true")
     p_check.add_argument("--no-verify-original", action="store_true", help="no avisar de corpus anticuado")
-    p_check.add_argument("--format", choices=["console", "markdown", "github", "json"], default="console")
+    p_check.add_argument(
+        "--format",
+        choices=["console", "markdown", "github", "json", "junit"],
+        default="console",
+    )
     p_check.add_argument("--quiet", action="store_true")
     p_check.set_defaults(func=cmd_check)
+
+    p_badge = sub.add_parser("badge", help="escribe una chapa SVG con el resultado, para el README")
+    add_common(p_badge)
+    p_badge.add_argument("--out", default="fiel.svg", help="fichero SVG de salida")
+    p_badge.set_defaults(func=cmd_badge)
 
     p_base = sub.add_parser("baseline", help="acepta las divergencias actuales")
     add_common(p_base)

@@ -22,6 +22,7 @@ class PairResult:
     pair_id: str
     total: int = 0
     passed: int = 0
+    cases: list[str] = field(default_factory=list)
     divergences: list[Divergence] = field(default_factory=list)
     drifted: list[str] = field(default_factory=list)   # el original ya no coincide con el corpus
     errors: list[str] = field(default_factory=list)
@@ -131,6 +132,7 @@ def _run_pair(
             result.passed += 1
         else:
             result.divergences.append(divergence)
+        result.cases.append(case.id)
 
     result.divergences.sort(key=lambda d: d.case_id)
     return result
