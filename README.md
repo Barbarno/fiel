@@ -159,11 +159,12 @@ idempotente listo para publicar.
 | `fiel coverage` | cuántas líneas del original ejecuta el corpus, y cuáles no |
 | `fiel probe` | prueba una entrada suelta ahora mismo, sin grabarla |
 | `fiel shrink` | reduce un caso que diverge al mínimo que sigue divergiendo |
+| `fiel guard` | instala `fiel check` como hook de git: no se commitea una divergencia nueva |
 
 Opciones útiles de `check`: `--pair`, `--case`, `--jobs`, `--strict` (ignora el
 baseline), `--no-baseline`, `--format console|markdown|github|json`.
 
-## Cuatro comandos que se usan en la mesa
+## Cinco comandos que se usan en la mesa
 
 No son adorno: cada uno responde a una pregunta que aparece en mitad de una
 revisión.
@@ -223,6 +224,26 @@ $ fiel doctor --smoke
 
 Y `fiel watch` cierra el círculo: deja la comprobación corriendo y la repite en
 cuanto cambia el corpus o cualquiera de los programas.
+
+**«¿Y si nadie se acuerda de lanzarlo?»** — `fiel guard`. Escribe el hook de
+git que ejecuta la misma comprobación antes de crear el commit:
+
+```bash
+$ fiel guard --install --pair cron-fiel
+  repositorio  /ruta/al/proyecto
+  hook         .git\hooks\pre-commit
+  comando      python -m fiel --spec "fiel.toml" check --pair "cron-fiel"
+  estado       instalado
+
+desde ahora, 'git commit' ejecuta la comprobacion antes de crear el commit.
+```
+
+No inventa un comando distinto: el hook llama a `fiel check` y devuelve su
+código de salida, así que si sale 1 el commit no existe. Con `--pair` se apunta
+a las parejas que tienen que seguir siendo fieles —el ejemplo del repositorio
+tiene una rota a propósito— y `fiel guard --remove` lo quita. Si el fichero del
+hook ya existía y lo escribió otra herramienta, se niega a pisarlo salvo con
+`--force`.
 
 ## Lo que el corpus no cubre
 

@@ -21,6 +21,7 @@ from .bisect import BisectError, run_bisect
 from .bot import BotError, resolve_token, upsert_comment
 from .demo import run_demo
 from .doctor import cmd_doctor
+from .guard import cmd_guard
 from .report import console, github_annotations, markdown
 from .report_html import write as write_html
 from .spec import SpecError, TEMPLATE, load
@@ -447,7 +448,7 @@ def cmd_probe(args: argparse.Namespace) -> int:
         print(json.dumps([probe_mod.as_json(r) for r in resultados], indent=2, ensure_ascii=False))
     else:
         for resultado in resultados:
-            print(probe_mod.console(resultado))
+            print(probe_mod.console(resultado, diff=args.diff))
             print("")
 
     return EXIT_OK if all(r.fiel for r in resultados) else EXIT_DIVERGENCE
@@ -575,8 +576,23 @@ def build_parser() -> argparse.ArgumentParser:
     add_common(p_prb)
     p_prb.add_argument("--input", action="append", help="entrada a probar; @fichero para leerla de disco (repetible)")
     p_prb.add_argument("--stdin", action="store_true", help="lee la entrada de la entrada estandar")
+    p_prb.add_argument("--diff", action="store_true", help="muestra las dos salidas como diff unificado")
     p_prb.add_argument("--format", choices=["console", "json"], default="console")
     p_prb.set_defaults(func=cmd_probe)
+
+    p_grd = sub.add_parser("guard", help="instala fiel como hook de git (pre-commit)")
+    p_grd.add_argument("--install", action="store_true", help="escribe el hook")
+    p_grd.add_argument("--remove", action="store_true", help="quita el hook que escribio fiel")
+    p_grd.add_argument(
+        "--pair",
+        action="append",
+        metavar="ID",
+        help="solo vigila esta pareja (repetible); por defecto, todas",
+    )
+    p_grd.add_argument("--hook", default="pre-commit", help="hook a usar (por defecto: pre-commit)")
+    p_grd.add_argument("--python", default="python", help="interprete que ejecutara el hook")
+    p_grd.add_argument("--force", action="store_true", help="sustituye un hook que no escribio fiel")
+    p_grd.set_defaults(func=cmd_guard)
 
     return parser
 

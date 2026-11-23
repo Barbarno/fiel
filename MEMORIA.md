@@ -142,10 +142,11 @@ fiel/
 ├── coverage.py    cuenta las lineas del original que ejecuta el corpus
 ├── probe.py       prueba una entrada suelta contra una pareja
 ├── shrink.py      reduce un caso que diverge al minimo (ddmin)
+├── guard.py       instala la comprobacion como hook de git
 └── cli.py          los comandos
 ```
 
-3.584 líneas no vacías de motor, 91 pruebas automáticas, cero dependencias externas.
+3.838 líneas no vacías de motor, 96 pruebas automáticas, cero dependencias externas.
 
 ### 6.2 Los comandos
 
@@ -164,6 +165,7 @@ fiel/
 | `fiel coverage` | mide cuántas líneas del original ejecuta el corpus |
 | `fiel probe` | prueba una entrada suelta, sin grabarla en el corpus |
 | `fiel shrink` | reduce un caso que diverge al mínimo que sigue fallando |
+| `fiel guard` | instala `fiel check` como hook de git: el commit no se crea si hay divergencia |
 
 ### 6.3 El corpus
 
@@ -198,7 +200,7 @@ formato y la herramienta sería inservible.
 
 ### 7.1 Pruebas automáticas
 
-91 pruebas unitarias sobre el motor: comparación, normalización, corpus,
+96 pruebas unitarias sobre el motor: comparación, normalización, corpus,
 baseline, importación, informe y CLI. Se ejecutan en menos de un segundo.
 
 ### 7.2 Integración continua

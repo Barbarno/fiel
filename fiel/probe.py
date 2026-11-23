@@ -13,6 +13,7 @@ Sale 0 si el port es fiel en esa entrada y 1 si no, para poder encadenarlo.
 
 from __future__ import annotations
 
+import difflib
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -36,6 +37,8 @@ class ProbeResult:
     port: Observation
     divergencia: Divergence | None
     posicion: int = 0
+    texto_original: str = ""
+    texto_port: str = ""
 
     @property
     def fiel(self) -> bool:
@@ -65,6 +68,7 @@ def una(pair, project: Project, payload: bytes) -> ProbeResult:
         raise ProbeError(str(exc)) from exc
 
     posicion = 0
+    izquierda = derecha = ""
     if divergencia is not None and divergencia.kind in {"output", "error-text"}:
         try:
             izquierda = normalize(original.output, pair.normalize)
@@ -81,6 +85,8 @@ def una(pair, project: Project, payload: bytes) -> ProbeResult:
         port=port,
         divergencia=divergencia,
         posicion=posicion,
+        texto_original=izquierda,
+        texto_port=derecha,
     )
 
 
@@ -101,7 +107,7 @@ def _texto(datos: bytes, limite: int = 120) -> str:
     return visible
 
 
-def console(resultado: ProbeResult) -> str:
+def console(resultado: ProbeResult, diff: bool = False) -> str:
     lineas = [f"entrada   {_texto(resultado.payload)}"]
     if resultado.fiel:
         lineas.append(f"original  {resultado.original.status}: {_texto(resultado.original.output)}")
@@ -116,8 +122,27 @@ def console(resultado: ProbeResult) -> str:
     lineas.append(f"tipo      {divergencia.kind}")
     if resultado.posicion:
         lineas.append(f"desde     el caracter {resultado.posicion}")
+    if diff and resultado.texto_original != resultado.texto_port:
+        lineas.append("")
+        lineas.extend(unified(resultado))
     lineas.append("veredicto NO FIEL")
     return "\n".join(lineas)
+
+
+def unified(resultado: ProbeResult, context: int = 2) -> list[str]:
+    """Las dos salidas como diff unificado: - lo que hacia el original, + lo que hace el port."""
+    izquierda = resultado.texto_original.split("\n")
+    derecha = resultado.texto_port.split("\n")
+    return list(
+        difflib.unified_diff(
+            izquierda,
+            derecha,
+            fromfile="original",
+            tofile="port",
+            n=context,
+            lineterm="",
+        )
+    )
 
 
 def as_json(resultado: ProbeResult) -> dict:

@@ -164,3 +164,60 @@ jobs:
 
       - name: Watch da una vuelta y termina
         run: fiel --root examples/demo watch --pair cron-fiel --vueltas 1 --interval 0.1 --quiet
+
+  puerta:
+    name: el hook de git bloquea un commit roto
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Instalar fiel
+        run: pip install .
+
+      - name: Un repositorio de pruebas con el ejemplo dentro
+        run: |
+          mkdir "$RUNNER_TEMP/puerta"
+          cp -r examples/demo/. "$RUNNER_TEMP/puerta/"
+          cd "$RUNNER_TEMP/puerta"
+          git init -q
+          git config user.email fiel@example.invalid
+          git config user.name fiel
+          git add -A
+          git commit -qm "base"
+          fiel guard --install --pair cron-fiel
+          test -f .git/hooks/pre-commit
+
+      - name: Un commit limpio pasa
+        run: |
+          cd "$RUNNER_TEMP/puerta"
+          git commit -q --allow-empty -m "limpio"
+
+      - name: Una linea que rompe el port detiene el commit
+        run: |
+          cd "$RUNNER_TEMP/puerta"
+          printf '\nraise SystemExit(3)\n' >> port.py
+          git add -A
+          set +e
+          git commit -qm "roto" 2>&1 | tee salida.txt
+          codigo=${PIPESTATUS[0]}
+          set -e
+          echo "commit roto -> $codigo (se espera distinto de 0)"
+          if [ "$codigo" -eq 0 ]; then
+            echo "::error::el commit roto se creo igual"
+            exit 1
+          fi
+          if git log --oneline | grep -q "roto"; then
+            echo "::error::el commit roto aparece en el historial"
+            exit 1
+          fi
+
+      - name: Quitar la puerta deja commitear otra vez
+        run: |
+          cd "$RUNNER_TEMP/puerta"
+          fiel guard --remove
+          test ! -f .git/hooks/pre-commit
+          git commit -qam "con la puerta quitada"

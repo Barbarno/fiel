@@ -10,7 +10,7 @@ El único acto que usa el navegador es el 9 (abre un HTML local) y el 12
 ## Antes de empezar (5 minutos antes, en el pasillo)
 
 1. Abre una terminal **nueva** en `C:\Users\Dano\Documents\Default Project\fiel`.
-2. Comprueba que responde: `fiel --version` → debe decir `fiel 0.3.0`.
+2. Comprueba que responde: `fiel --version` → debe decir `fiel 0.4.0`.
    Si no responde: `python -m fiel --version` y usa esa forma en todo el guion.
 3. Ten abierta en el navegador, en otra pestaña, esta dirección:
    `https://github.com/Barbarno/fiel/pull/1`

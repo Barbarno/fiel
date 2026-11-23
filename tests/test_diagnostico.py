@@ -7,6 +7,7 @@ no necesitan toolchain de Rust.
 from __future__ import annotations
 
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -19,6 +20,7 @@ from fiel import cli
 from fiel import corpus as corpus_mod
 from fiel import coverage as coverage_mod
 from fiel import doctor as doctor_mod
+from fiel import guard as guard_mod
 from fiel import probe as probe_mod
 from fiel import shrink as shrink_mod
 from fiel import watch as watch_mod
@@ -220,13 +222,60 @@ class WatchTests(unittest.TestCase):
         self.assertGreater(resultado.fallos, 0)
 
 
+class GuardTests(unittest.TestCase):
+    def _repo(self, tmp: str) -> Path:
+        raiz = Path(tmp)
+        subprocess.run(["git", "init", "-q"], cwd=tmp, check=True)
+        (raiz / "fiel.toml").write_text("[project]\n", encoding="utf-8")
+        return raiz
+
+    def test_instala_y_quita_el_hook(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            raiz = self._repo(tmp)
+
+            puesto = guard_mod.instalar(raiz)
+            self.assertTrue(puesto.instalado)
+            self.assertTrue(puesto.nuestro)
+            contenido = puesto.hook.read_text(encoding="utf-8")
+            self.assertIn("fiel: puerta de fidelidad", contenido)
+            self.assertIn(" check", contenido)
+
+            quitado = guard_mod.quitar(raiz)
+            self.assertFalse(quitado.instalado)
+
+    def test_no_pisa_un_hook_ajeno(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            raiz = self._repo(tmp)
+            ajeno = guard_mod.dir_hooks(raiz) / "pre-commit"
+            ajeno.parent.mkdir(parents=True, exist_ok=True)
+            ajeno.write_text("#!/bin/sh\necho hola\n", encoding="utf-8")
+
+            with self.assertRaises(guard_mod.GuardError):
+                guard_mod.instalar(raiz)
+
+            self.assertIn("hola", ajeno.read_text(encoding="utf-8"))
+
+    def test_sin_especificacion_no_instala(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            raiz = self._repo(tmp)
+            (raiz / "fiel.toml").unlink()
+
+            with self.assertRaises(guard_mod.GuardError):
+                guard_mod.instalar(raiz)
+
+    def test_fuera_de_un_repositorio_se_queja(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(guard_mod.GuardError):
+                guard_mod.estado(Path(tmp))
+
+
 class CliTests(unittest.TestCase):
     def test_los_comandos_nuevos_estan_en_el_ayuda(self) -> None:
         parser = cli.build_parser()
         acciones = [a for a in parser._actions if getattr(a, "choices", None)]
         comandos = set(acciones[0].choices) if acciones else set()
 
-        for nombre in ("coverage", "probe", "shrink", "doctor", "watch"):
+        for nombre in ("coverage", "probe", "shrink", "doctor", "watch", "guard"):
             self.assertIn(nombre, comandos)
 
     def test_probe_por_linea_de_comandos(self) -> None:
